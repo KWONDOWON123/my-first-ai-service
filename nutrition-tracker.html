@@ -1,0 +1,1015 @@
+<title>끼니표</title>
+<meta name="color-scheme" content="light dark">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=Karla:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #eef1e9;
+    --surface: #ffffff;
+    --surface-2: #f6f7f2;
+    --line: #cdd4c1;
+    --line-strong: #1b2116;
+    --ink: #1b2116;
+    --ink-muted: #5c6656;
+    --ink-faint: #8b9482;
+    --accent: #33507a;
+    --accent-ink: #ffffff;
+    --accent-soft: #e3e9f1;
+    --ok: #2e7d4f;
+    --ok-soft: #dfefe4;
+    --warn: #93650a;
+    --warn-soft: #f6ecd6;
+    --bad: #a83a24;
+    --bad-soft: #f5e0d9;
+    --shadow: 0 1px 0 rgba(27,33,22,0.06);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #14170f;
+      --surface: #1c2118;
+      --surface-2: #20261b;
+      --line: #38402e;
+      --line-strong: #e9ede1;
+      --ink: #e9ede1;
+      --ink-muted: #a7b09a;
+      --ink-faint: #6f7864;
+      --accent: #8fadd6;
+      --accent-ink: #10151d;
+      --accent-soft: #232e3d;
+      --ok: #7ec99a;
+      --ok-soft: #223226;
+      --warn: #e0b45d;
+      --warn-soft: #332a17;
+      --bad: #e2917c;
+      --bad-soft: #3a2018;
+      --shadow: 0 1px 0 rgba(0,0,0,0.3);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #14170f;
+    --surface: #1c2118;
+    --surface-2: #20261b;
+    --line: #38402e;
+    --line-strong: #e9ede1;
+    --ink: #e9ede1;
+    --ink-muted: #a7b09a;
+    --ink-faint: #6f7864;
+    --accent: #8fadd6;
+    --accent-ink: #10151d;
+    --accent-soft: #232e3d;
+    --ok: #7ec99a;
+    --ok-soft: #223226;
+    --warn: #e0b45d;
+    --warn-soft: #332a17;
+    --bad: #e2917c;
+    --bad-soft: #3a2018;
+    --shadow: 0 1px 0 rgba(0,0,0,0.3);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Karla", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    padding: 0 20px 64px;
+  }
+  h1, h2, h3, .display {
+    font-family: "Archivo", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    text-wrap: balance;
+    letter-spacing: -0.01em;
+  }
+  .num, input[type="number"], .tabular {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-variant-numeric: tabular-nums;
+  }
+  button, input, select { font: inherit; color: inherit; }
+  button { cursor: pointer; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+
+  .wrap { max-width: 920px; margin: 0 auto; }
+
+  /* ---- top masthead, nutrition-label inspired ---- */
+  .masthead {
+    padding: 28px 0 14px;
+    border-bottom: 4px solid var(--line-strong);
+  }
+  .masthead-row { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .brand { font-size: 28px; font-weight: 800; margin: 0; }
+  .brand-sub { color: var(--ink-muted); font-size: 13px; margin-top: 4px; }
+  .profile-chip {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 999px;
+    padding: 6px 8px 6px 14px; box-shadow: var(--shadow);
+  }
+  .profile-chip .name { font-weight: 700; }
+  .profile-chip .meta { color: var(--ink-muted); font-size: 12px; }
+  .profile-chip button {
+    background: var(--surface-2); border: 1px solid var(--line); border-radius: 999px;
+    padding: 5px 10px; font-size: 12px; color: var(--ink-muted);
+  }
+  .profile-chip button:hover { color: var(--ink); border-color: var(--ink-faint); }
+
+  .banner {
+    margin-top: 14px; padding: 10px 14px; border-radius: 8px;
+    background: var(--warn-soft); color: var(--warn); font-size: 13px;
+    border: 1px solid var(--warn);
+  }
+
+  /* ---- tabs ---- */
+  .tabs { display: flex; gap: 4px; margin: 22px 0 18px; border-bottom: 1px solid var(--line); }
+  .tab-btn {
+    background: none; border: none; padding: 10px 4px; margin-right: 20px;
+    font-family: "Archivo", sans-serif; font-weight: 700; font-size: 15px;
+    color: var(--ink-muted); border-bottom: 3px solid transparent; margin-bottom: -1px;
+  }
+  .tab-btn[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); }
+
+  /* ---- gate screen ---- */
+  .gate { max-width: 480px; margin: 40px auto 0; }
+  .gate p.lead { color: var(--ink-muted); font-size: 14px; line-height: 1.7; }
+  .gate-section { margin-top: 28px; }
+  .gate-section h2 { font-size: 15px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-muted); margin: 0 0 10px; }
+  .profile-list { display: flex; flex-direction: column; gap: 8px; }
+  .profile-row {
+    display: flex; justify-content: space-between; align-items: center;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
+    padding: 12px 14px; text-align: left; box-shadow: var(--shadow);
+  }
+  .profile-row:hover { border-color: var(--accent); }
+  .profile-row .p-name { font-weight: 700; }
+  .profile-row .p-meta { color: var(--ink-muted); font-size: 12px; margin-top: 2px; }
+  .profile-row .arrow { color: var(--ink-faint); }
+  .empty-note { color: var(--ink-faint); font-size: 13px; padding: 10px 2px; }
+
+  .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+  .field label { font-size: 12px; font-weight: 700; color: var(--ink-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+  .field input[type="text"] {
+    border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px;
+    background: var(--surface); color: var(--ink);
+  }
+  .radio-row { display: flex; gap: 8px; }
+  .radio-pill {
+    flex: 1; border: 1px solid var(--line); border-radius: 8px; padding: 9px 10px;
+    text-align: center; font-size: 13px; background: var(--surface); position: relative;
+  }
+  .radio-pill input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+  .radio-pill.checked { border-color: var(--accent); background: var(--accent-soft); font-weight: 700; }
+
+  .btn-primary {
+    width: 100%; background: var(--accent); color: var(--accent-ink); border: none;
+    border-radius: 8px; padding: 12px; font-weight: 700; font-size: 14px; margin-top: 6px;
+  }
+  .btn-primary:hover { opacity: 0.92; }
+  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  /* ---- app layout ---- */
+  .app-grid { display: grid; grid-template-columns: 1.15fr 1fr; gap: 22px; align-items: start; }
+  @media (max-width: 760px) { .app-grid { grid-template-columns: 1fr; } }
+
+  .panel {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
+    padding: 18px 20px; box-shadow: var(--shadow);
+  }
+  .panel + .panel { margin-top: 18px; }
+  .panel h2 { font-size: 15px; margin: 0 0 4px; }
+  .panel .sub { color: var(--ink-muted); font-size: 12.5px; margin: 0 0 14px; }
+
+  .date-row { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+  .date-row input[type="date"] {
+    border: 1px solid var(--line); border-radius: 8px; padding: 7px 10px; background: var(--surface); color: var(--ink);
+  }
+  .date-row .today-btn { border: 1px solid var(--line); background: var(--surface-2); border-radius: 8px; padding: 7px 10px; font-size: 12px; }
+
+  /* add-food form */
+  .food-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 12px; }
+  .food-form-grid .span2 { grid-column: 1 / -1; }
+  .food-name-field { position: relative; }
+  .suggest-list {
+    position: absolute; left: 0; right: 0; top: 100%; margin-top: 4px; z-index: 20;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 8px;
+    max-height: 240px; overflow-y: auto; box-shadow: 0 8px 24px rgba(0,0,0,0.14);
+  }
+  .suggest-item { padding: 8px 12px; cursor: pointer; font-size: 13px; display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+  .suggest-item:hover { background: var(--accent-soft); }
+  .suggest-item .s-serving { color: var(--ink-muted); font-size: 11px; white-space: nowrap; }
+  .link-chip {
+    margin-top: 8px; display: flex; align-items: center; flex-wrap: wrap; gap: 8px;
+    background: var(--accent-soft); border: 1px solid var(--accent); border-radius: 8px;
+    padding: 8px 10px; font-size: 12.5px;
+  }
+  .link-chip label { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--ink-muted); text-transform: none; letter-spacing: normal; }
+  .link-chip input[type="number"] { width: 60px; padding: 4px 6px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); }
+  .link-chip button { margin-left: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 4px 9px; font-size: 11.5px; color: var(--ink-muted); }
+  .link-chip button:hover { color: var(--ink); border-color: var(--ink-faint); }
+  .food-form-grid input, .food-form-grid select {
+    width: 100%; border: 1px solid var(--line); border-radius: 8px; padding: 9px 10px;
+    background: var(--surface-2); color: var(--ink);
+  }
+  .food-form-grid label { display: block; font-size: 11px; color: var(--ink-muted); margin-bottom: 4px; }
+  .add-btn {
+    margin-top: 14px; background: var(--ink); color: var(--surface); border: none;
+    border-radius: 8px; padding: 10px 16px; font-weight: 700; font-size: 13px;
+  }
+  @media (prefers-color-scheme: dark) { .add-btn { background: var(--accent); color: var(--accent-ink); } }
+  :root[data-theme="dark"] .add-btn { background: var(--accent); color: var(--accent-ink); }
+
+  /* food list */
+  .meal-group { margin-top: 18px; }
+  .meal-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-muted); border-bottom: 1px solid var(--line); padding-bottom: 6px; margin-bottom: 8px; }
+  .food-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px dashed var(--line); gap: 10px; }
+  .food-item:last-child { border-bottom: none; }
+  .food-item .fi-name { font-weight: 600; }
+  .food-item .fi-nums { color: var(--ink-muted); font-size: 12px; }
+  .food-item .fi-del { background: none; border: none; color: var(--ink-faint); font-size: 16px; padding: 2px 6px; }
+  .food-item .fi-del:hover { color: var(--bad); }
+  .no-items { color: var(--ink-faint); font-size: 13px; padding: 6px 0; }
+
+  /* nutrient gauge rows */
+  .summary-line { font-size: 13.5px; padding: 10px 12px; border-radius: 8px; margin-bottom: 16px; font-weight: 600; }
+  .summary-line[data-tone="ok"] { background: var(--ok-soft); color: var(--ok); }
+  .summary-line[data-tone="warn"] { background: var(--warn-soft); color: var(--warn); }
+
+  .nrow { padding: 10px 0; border-bottom: 1px solid var(--line); }
+  .nrow:last-child { border-bottom: none; }
+  .nrow-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+  .nlabel { font-weight: 700; font-size: 13.5px; }
+  .chip { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px; }
+  .chip[data-tone="ok"] { background: var(--ok-soft); color: var(--ok); }
+  .chip[data-tone="warn"] { background: var(--warn-soft); color: var(--warn); }
+  .chip[data-tone="bad"] { background: var(--bad-soft); color: var(--bad); }
+
+  .gauge { position: relative; height: 8px; background: var(--surface-2); border: 1px solid var(--line); border-radius: 999px; overflow: hidden; }
+  .gauge-zone { position: absolute; top: 0; bottom: 0; background: var(--accent-soft); }
+  .gauge-fill { position: absolute; top: 0; bottom: 0; left: 0; border-radius: 999px 0 0 999px; transition: width 0.25s ease; }
+  .gauge-fill[data-tone="ok"] { background: var(--ok); }
+  .gauge-fill[data-tone="warn"] { background: var(--warn); }
+  .gauge-fill[data-tone="bad"] { background: var(--bad); }
+
+  .nrow-nums { display: flex; justify-content: space-between; margin-top: 5px; font-size: 12px; color: var(--ink-muted); }
+  .nrow-nums .consumed { color: var(--ink); font-weight: 600; }
+
+  /* history */
+  .history-list { display: flex; flex-direction: column; gap: 8px; }
+  .history-row {
+    display: flex; justify-content: space-between; align-items: center; gap: 10px;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
+    padding: 12px 14px; text-align: left; box-shadow: var(--shadow);
+  }
+  .history-row:hover { border-color: var(--accent); }
+  .history-row .h-date { font-weight: 700; font-family: "IBM Plex Mono", monospace; }
+  .history-row .h-kcal { font-size: 12px; color: var(--ink-muted); margin-top: 2px; }
+  .dot-row { display: flex; gap: 4px; }
+  .dot { width: 7px; height: 7px; border-radius: 50%; }
+  .dot[data-tone="ok"] { background: var(--ok); }
+  .dot[data-tone="warn"] { background: var(--warn); }
+  .dot[data-tone="bad"] { background: var(--bad); }
+
+  .footnote { margin-top: 32px; color: var(--ink-faint); font-size: 11.5px; line-height: 1.7; border-top: 1px solid var(--line); padding-top: 14px; }
+</style>
+
+<div class="wrap" id="app"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  // ---------------------------------------------------------------
+  // Reference data: 2020/2025 한국인 영양소 섭취기준 기반 그룹별 목표치
+  // ---------------------------------------------------------------
+  var TARGETS = {
+    "M-1929": { kcal: 2600, protein: 65, carb: [358, 423], fat: [43, 87], satfat: 20, sugar: 65, sodium: 2300, fiber: 30 },
+    "F-1929": { kcal: 2000, protein: 55, carb: [275, 325], fat: [33, 67], satfat: 16, sugar: 50, sodium: 2300, fiber: 20 },
+    "M-3049": { kcal: 2500, protein: 65, carb: [344, 406], fat: [42, 83], satfat: 19, sugar: 63, sodium: 2300, fiber: 30 },
+    "F-3049": { kcal: 1900, protein: 50, carb: [261, 309], fat: [32, 63], satfat: 15, sugar: 48, sodium: 2300, fiber: 20 }
+  };
+
+  var NUTRIENTS = [
+    { key: "kcal",    label: "열량",    unit: "kcal", kind: "band" },
+    { key: "protein", label: "단백질",  unit: "g",    kind: "band" },
+    { key: "carb",    label: "탄수화물", unit: "g",    kind: "range" },
+    { key: "fat",     label: "지방",    unit: "g",    kind: "range" },
+    { key: "satfat",  label: "포화지방", unit: "g",    kind: "maxOnly" },
+    { key: "sugar",   label: "당류",    unit: "g",    kind: "maxOnly" },
+    { key: "sodium",  label: "나트륨",  unit: "mg",   kind: "maxOnly" },
+    { key: "fiber",   label: "식이섬유", unit: "g",    kind: "minOnly" }
+  ];
+
+  var MEALS = ["아침", "점심", "저녁", "간식"];
+
+  // 커뮤니티 리서치+검증으로 구축한 한국 음식 평균 영양정보 데이터베이스 (1인분 기준)
+  var FOOD_DB = [{"name":"흰쌀밥","aliases":["쌀밥","공기밥","밥"],"servingDesc":"1공기(약 210g)","servingGrams":210,"kcal":310,"carb":68,"protein":6,"fat":0.6,"satfat":0.2,"sugar":0.2,"sodium":5,"fiber":0.7},{"name":"현미밥","aliases":["현미쌀밥"],"servingDesc":"1공기(약 210g)","servingGrams":210,"kcal":300,"carb":65,"protein":6.5,"fat":2,"satfat":0.5,"sugar":0.3,"sodium":5,"fiber":3.5},{"name":"잡곡밥","aliases":["오곡밥","혼합잡곡밥"],"servingDesc":"1공기(약 210g)","servingGrams":210,"kcal":320,"carb":68,"protein":7.5,"fat":2.5,"satfat":0.6,"sugar":0.5,"sodium":5,"fiber":4},{"name":"흰죽","aliases":["쌀죽"],"servingDesc":"1그릇(약 400g)","servingGrams":400,"kcal":220,"carb":48,"protein":4,"fat":1,"satfat":0.3,"sugar":0.2,"sodium":300,"fiber":0.5},{"name":"전복죽","aliases":[],"servingDesc":"1그릇(약 450g)","servingGrams":450,"kcal":380,"carb":58,"protein":16,"fat":9,"satfat":2.5,"sugar":0.5,"sodium":750,"fiber":0.8},{"name":"잔치국수","aliases":["온면"],"servingDesc":"1그릇(약 550g)","servingGrams":550,"kcal":480,"carb":88,"protein":16,"fat":6,"satfat":1.5,"sugar":5,"sodium":1400,"fiber":2},{"name":"비빔국수","aliases":["비빔면"],"servingDesc":"1그릇(약 450g)","servingGrams":450,"kcal":520,"carb":95,"protein":12,"fat":10,"satfat":1.5,"sugar":18,"sodium":1300,"fiber":3},{"name":"칼국수","aliases":["바지락칼국수"],"servingDesc":"1그릇(약 600g)","servingGrams":600,"kcal":540,"carb":90,"protein":20,"fat":10,"satfat":2,"sugar":4,"sodium":1700,"fiber":3},{"name":"라면","aliases":["봉지라면","라면 한 봉지"],"servingDesc":"1봉지(약 500g, 조리 후)","servingGrams":500,"kcal":500,"carb":78,"protein":10,"fat":16,"satfat":8,"sugar":5,"sodium":1800,"fiber":2.5},{"name":"짜장면","aliases":["자장면"],"servingDesc":"1그릇(약 550g)","servingGrams":550,"kcal":650,"carb":100,"protein":18,"fat":18,"satfat":3.5,"sugar":12,"sodium":1300,"fiber":4},{"name":"짬뽕","aliases":[],"servingDesc":"1그릇(약 650g)","servingGrams":650,"kcal":600,"carb":75,"protein":25,"fat":20,"satfat":3,"sugar":6,"sodium":2200,"fiber":4},{"name":"파스타(토마토소스)","aliases":["토마토파스타","스파게티"],"servingDesc":"1접시(약 350g)","servingGrams":350,"kcal":480,"carb":70,"protein":14,"fat":15,"satfat":3,"sugar":8,"sodium":800,"fiber":4},{"name":"파스타(크림소스)","aliases":["크림파스타"],"servingDesc":"1접시(약 350g)","servingGrams":350,"kcal":620,"carb":65,"protein":16,"fat":30,"satfat":15,"sugar":6,"sodium":750,"fiber":3},{"name":"식빵","aliases":["흰식빵"],"servingDesc":"2장(약 80g)","servingGrams":80,"kcal":210,"carb":38,"protein":7,"fat":3,"satfat":1,"sugar":4,"sodium":380,"fiber":2},{"name":"토스트(버터/잼)","aliases":["버터토스트"],"servingDesc":"1인분(약 100g)","servingGrams":100,"kcal":300,"carb":42,"protein":7,"fat":12,"satfat":6,"sugar":10,"sodium":420,"fiber":2},{"name":"김밥","aliases":["일반김밥"],"servingDesc":"1줄(약 250g)","servingGrams":250,"kcal":450,"carb":68,"protein":14,"fat":13,"satfat":3,"sugar":4,"sodium":900,"fiber":3},{"name":"참치김밥","aliases":[],"servingDesc":"1줄(약 260g)","servingGrams":260,"kcal":500,"carb":68,"protein":18,"fat":17,"satfat":3.5,"sugar":4,"sodium":950,"fiber":3},{"name":"볶음밥","aliases":["김치볶음밥","야채볶음밥"],"servingDesc":"1접시(약 400g)","servingGrams":400,"kcal":620,"carb":85,"protein":16,"fat":22,"satfat":4,"sugar":4,"sodium":1100,"fiber":3},{"name":"오므라이스","aliases":[],"servingDesc":"1접시(약 450g)","servingGrams":450,"kcal":650,"carb":85,"protein":20,"fat":24,"satfat":6,"sugar":8,"sodium":1200,"fiber":2.5},{"name":"주먹밥","aliases":["삼각김밥"],"servingDesc":"1개(약 110g)","servingGrams":110,"kcal":190,"carb":33,"protein":5,"fat":4,"satfat":1,"sugar":2,"sodium":400,"fiber":1},{"name":"떡국","aliases":[],"servingDesc":"1그릇(약 500g)","servingGrams":500,"kcal":420,"carb":65,"protein":20,"fat":9,"satfat":3,"sugar":3,"sodium":1400,"fiber":1.5},{"name":"수제비","aliases":[],"servingDesc":"1그릇(약 550g)","servingGrams":550,"kcal":420,"carb":75,"protein":13,"fat":8,"satfat":1.5,"sugar":3,"sodium":1500,"fiber":2.5},{"name":"된장찌개","aliases":["된장국"],"servingDesc":"1인분(뚝배기 1개, 약 400g)","servingGrams":400,"kcal":150,"carb":12,"protein":10,"fat":7,"satfat":2,"sugar":3,"sodium":900,"fiber":3},{"name":"김치찌개","aliases":["김치찌개(돼지고기)"],"servingDesc":"1인분(뚝배기 1개, 약 450g)","servingGrams":450,"kcal":260,"carb":10,"protein":14,"fat":18,"satfat":6,"sugar":3,"sodium":1100,"fiber":3},{"name":"순두부찌개","aliases":["순두부"],"servingDesc":"1인분(뚝배기 1개, 약 450g)","servingGrams":450,"kcal":230,"carb":10,"protein":15,"fat":15,"satfat":4,"sugar":3,"sodium":1000,"fiber":2},{"name":"부대찌개","aliases":["부대찌개(1인분)"],"servingDesc":"1인분(전골냄비 소분, 약 500g)","servingGrams":500,"kcal":420,"carb":25,"protein":22,"fat":26,"satfat":9,"sugar":5,"sodium":1400,"fiber":3},{"name":"미역국","aliases":["미역국(소고기)"],"servingDesc":"1인분(국그릇 1개, 약 350g)","servingGrams":350,"kcal":110,"carb":6,"protein":8,"fat":6,"satfat":2,"sugar":1,"sodium":700,"fiber":2},{"name":"콩나물국","aliases":[],"servingDesc":"1인분(국그릇 1개, 약 350g)","servingGrams":350,"kcal":45,"carb":5,"protein":4,"fat":1.5,"satfat":0.3,"sugar":1,"sodium":650,"fiber":2},{"name":"갈비탕","aliases":[],"servingDesc":"1인분(뚝배기 1개, 약 500g)","servingGrams":500,"kcal":380,"carb":10,"protein":28,"fat":24,"satfat":9,"sugar":2,"sodium":1000,"fiber":1},{"name":"삼계탕","aliases":[],"servingDesc":"1인분(1마리, 약 700g)","servingGrams":700,"kcal":550,"carb":25,"protein":45,"fat":28,"satfat":8,"sugar":1,"sodium":900,"fiber":1},{"name":"육개장","aliases":[],"servingDesc":"1인분(뚝배기 1개, 약 450g)","servingGrams":450,"kcal":260,"carb":12,"protein":18,"fat":15,"satfat":5,"sugar":3,"sodium":1100,"fiber":2},{"name":"설렁탕","aliases":[],"servingDesc":"1인분(뚝배기 1개, 약 500g)","servingGrams":500,"kcal":330,"carb":8,"protein":26,"fat":20,"satfat":8,"sugar":1,"sodium":850,"fiber":0.5},{"name":"북엇국","aliases":["북어국","황태해장국","북어해장국"],"servingDesc":"1인분(국그릇 1개, 약 400g)","servingGrams":400,"kcal":120,"carb":6,"protein":16,"fat":3,"satfat":0.8,"sugar":1,"sodium":820,"fiber":1},{"name":"동태찌개","aliases":["생태찌개"],"servingDesc":"1인분(냄비 소분, 약 450g)","servingGrams":450,"kcal":180,"carb":9,"protein":22,"fat":6,"satfat":1.5,"sugar":2,"sodium":1000,"fiber":2},{"name":"청국장찌개","aliases":["청국장"],"servingDesc":"1인분(뚝배기 1개, 약 400g)","servingGrams":400,"kcal":190,"carb":14,"protein":13,"fat":9,"satfat":2.5,"sugar":3,"sodium":950,"fiber":4},{"name":"소고기무국","aliases":["뭇국"],"servingDesc":"1인분(국그릇 1개, 약 400g)","servingGrams":400,"kcal":130,"carb":6,"protein":11,"fat":7,"satfat":2.5,"sugar":2,"sodium":750,"fiber":1.5},{"name":"감자탕","aliases":[],"servingDesc":"1인분(전골 소분, 약 550g)","servingGrams":550,"kcal":420,"carb":18,"protein":26,"fat":26,"satfat":9,"sugar":3,"sodium":1200,"fiber":3},{"name":"해물순두부찌개","aliases":["해물순두부"],"servingDesc":"1인분(뚝배기 1개, 약 450g)","servingGrams":450,"kcal":210,"carb":9,"protein":16,"fat":12,"satfat":3,"sugar":2,"sodium":1050,"fiber":2},{"name":"아욱국","aliases":[],"servingDesc":"1인분(국그릇 1개, 약 350g)","servingGrams":350,"kcal":70,"carb":6,"protein":6,"fat":2.5,"satfat":0.5,"sugar":1,"sodium":650,"fiber":2.5},{"name":"곰탕","aliases":["곰국"],"servingDesc":"1인분(뚝배기 1개, 약 500g)","servingGrams":500,"kcal":300,"carb":5,"protein":24,"fat":20,"satfat":8,"sugar":1,"sodium":800,"fiber":0.5},{"name":"부대전골","aliases":[],"servingDesc":"1인분(전골 소분, 약 500g)","servingGrams":500,"kcal":400,"carb":22,"protein":20,"fat":25,"satfat":8,"sugar":4,"sodium":1300,"fiber":3},{"name":"두부김치찌개","aliases":["두부찌개"],"servingDesc":"1인분(뚝배기 1개, 약 450g)","servingGrams":450,"kcal":230,"carb":10,"protein":14,"fat":15,"satfat":5,"sugar":3,"sodium":1000,"fiber":3},{"name":"어묵탕","aliases":["오뎅탕"],"servingDesc":"1인분(냄비 소분, 약 400g)","servingGrams":400,"kcal":160,"carb":12,"protein":9,"fat":8,"satfat":2,"sugar":3,"sodium":1100,"fiber":1.5},{"name":"배추김치","aliases":["김치","포기김치"],"servingDesc":"1접시(약 40g)","servingGrams":40,"kcal":15,"carb":2.6,"protein":0.8,"fat":0.3,"satfat":0.05,"sugar":1.2,"sodium":320,"fiber":1},{"name":"깍두기","aliases":["무깍두기"],"servingDesc":"1접시(약 50g)","servingGrams":50,"kcal":20,"carb":4,"protein":0.6,"fat":0.2,"satfat":0.03,"sugar":2,"sodium":300,"fiber":1.1},{"name":"열무김치","aliases":[],"servingDesc":"1접시(약 40g)","servingGrams":40,"kcal":12,"carb":2.2,"protein":0.7,"fat":0.2,"satfat":0.03,"sugar":1,"sodium":280,"fiber":1.2},{"name":"총각김치","aliases":["알타리김치"],"servingDesc":"1접시(약 50g)","servingGrams":50,"kcal":22,"carb":4.3,"protein":0.7,"fat":0.2,"satfat":0.03,"sugar":2.1,"sodium":310,"fiber":1.3},{"name":"오이소박이","aliases":["오이김치"],"servingDesc":"1접시(약 40g)","servingGrams":40,"kcal":14,"carb":2.5,"protein":0.6,"fat":0.3,"satfat":0.04,"sugar":1.3,"sodium":260,"fiber":0.8},{"name":"파김치","aliases":[],"servingDesc":"1접시(약 30g)","servingGrams":30,"kcal":16,"carb":2.4,"protein":0.6,"fat":0.5,"satfat":0.07,"sugar":1.1,"sodium":250,"fiber":0.9},{"name":"백김치","aliases":[],"servingDesc":"1접시(약 40g)","servingGrams":40,"kcal":10,"carb":2,"protein":0.5,"fat":0.1,"satfat":0.02,"sugar":1,"sodium":200,"fiber":0.9},{"name":"시금치나물","aliases":["시금치무침"],"servingDesc":"1접시(약 40g)","servingGrams":40,"kcal":30,"carb":2.5,"protein":1.8,"fat":1.8,"satfat":0.25,"sugar":0.6,"sodium":180,"fiber":1.4},{"name":"콩나물무침","aliases":["콩나물나물"],"servingDesc":"1접시(약 40g)","servingGrams":40,"kcal":28,"carb":2.6,"protein":1.6,"fat":1.5,"satfat":0.2,"sugar":0.5,"sodium":170,"fiber":1.2},{"name":"숙주나물무침","aliases":["숙주나물"],"servingDesc":"1접시(약 40g)","servingGrams":40,"kcal":22,"carb":2.2,"protein":1.2,"fat":1.2,"satfat":0.15,"sugar":0.5,"sodium":160,"fiber":0.9},{"name":"고사리나물","aliases":[],"servingDesc":"1접시(약 40g)","servingGrams":40,"kcal":35,"carb":2.8,"protein":1.5,"fat":2.2,"satfat":0.3,"sugar":0.4,"sodium":190,"fiber":1.6},{"name":"도라지나물","aliases":[],"servingDesc":"1접시(약 40g)","servingGrams":40,"kcal":33,"carb":4,"protein":0.8,"fat":1.6,"satfat":0.2,"sugar":1,"sodium":180,"fiber":1.5},{"name":"미역줄기볶음","aliases":["미역줄기무침"],"servingDesc":"1접시(약 40g)","servingGrams":40,"kcal":32,"carb":2,"protein":0.7,"fat":2.4,"satfat":0.3,"sugar":0.6,"sodium":220,"fiber":1},{"name":"멸치볶음","aliases":["잔멸치볶음"],"servingDesc":"1접시(약 20g)","servingGrams":20,"kcal":55,"carb":4,"protein":4.5,"fat":2.5,"satfat":0.5,"sugar":2.8,"sodium":230,"fiber":0.3},{"name":"진미채볶음","aliases":["오징어채볶음"],"servingDesc":"1접시(약 25g)","servingGrams":25,"kcal":65,"carb":6.5,"protein":6,"fat":1.8,"satfat":0.3,"sugar":3.5,"sodium":260,"fiber":0.4},{"name":"어묵볶음","aliases":["오뎅볶음"],"servingDesc":"1접시(약 40g)","servingGrams":40,"kcal":60,"carb":5,"protein":3.5,"fat":3,"satfat":0.5,"sugar":2,"sodium":280,"fiber":0.3},{"name":"감자조림","aliases":[],"servingDesc":"1접시(약 50g)","servingGrams":50,"kcal":55,"carb":10.5,"protein":1,"fat":1,"satfat":0.15,"sugar":3.5,"sodium":220,"fiber":0.9},{"name":"연근조림","aliases":[],"servingDesc":"1접시(약 40g)","servingGrams":40,"kcal":50,"carb":10,"protein":0.8,"fat":0.8,"satfat":0.1,"sugar":4,"sodium":200,"fiber":1.2},{"name":"콩자반","aliases":["검은콩조림"],"servingDesc":"1접시(약 25g)","servingGrams":25,"kcal":45,"carb":5,"protein":3.5,"fat":1.5,"satfat":0.2,"sugar":2.5,"sodium":150,"fiber":1.5},{"name":"두부조림","aliases":[],"servingDesc":"1접시(약 50g)","servingGrams":50,"kcal":60,"carb":2.5,"protein":5,"fat":3.5,"satfat":0.5,"sugar":1,"sodium":250,"fiber":0.5},{"name":"무말랭이무침","aliases":[],"servingDesc":"1접시(약 25g)","servingGrams":25,"kcal":40,"carb":8,"protein":0.7,"fat":0.6,"satfat":0.08,"sugar":4,"sodium":210,"fiber":1.1},{"name":"양파장아찌","aliases":[],"servingDesc":"1접시(약 30g)","servingGrams":30,"kcal":18,"carb":4,"protein":0.3,"fat":0.05,"satfat":0.01,"sugar":2.5,"sodium":260,"fiber":0.5},{"name":"깻잎장아찌","aliases":["깻잎절임"],"servingDesc":"1접시(약 20g, 3~4장)","servingGrams":20,"kcal":15,"carb":2.5,"protein":0.6,"fat":0.3,"satfat":0.05,"sugar":1.2,"sodium":300,"fiber":0.6},{"name":"제육볶음","aliases":["돼지고기볶음","고추장돼지불고기","제육볶음덮밥용제육"],"servingDesc":"1접시(약 200g)","servingGrams":200,"kcal":420,"carb":15,"protein":24,"fat":29,"satfat":9,"sugar":8,"sodium":900,"fiber":2},{"name":"불고기","aliases":["소고기불고기"],"servingDesc":"1접시(약 200g)","servingGrams":200,"kcal":380,"carb":14,"protein":26,"fat":24,"satfat":8,"sugar":9,"sodium":850,"fiber":1},{"name":"갈비찜","aliases":["소갈비찜"],"servingDesc":"1인분(약 250g)","servingGrams":250,"kcal":480,"carb":18,"protein":32,"fat":30,"satfat":11,"sugar":10,"sodium":950,"fiber":1.5},{"name":"닭볶음탕","aliases":["닭도리탕"],"servingDesc":"1인분(약 300g)","servingGrams":300,"kcal":420,"carb":20,"protein":35,"fat":20,"satfat":5,"sugar":8,"sodium":1000,"fiber":2},{"name":"삼겹살구이","aliases":["삼겹살"],"servingDesc":"1인분(약 150g)","servingGrams":150,"kcal":510,"carb":1,"protein":26,"fat":45,"satfat":16,"sugar":0.5,"sodium":300,"fiber":0},{"name":"계란말이","aliases":["계란말이반찬"],"servingDesc":"1접시(약 100g)","servingGrams":100,"kcal":170,"carb":3,"protein":11,"fat":13,"satfat":4,"sugar":2,"sodium":400,"fiber":0.2},{"name":"계란찜","aliases":["계란탕"],"servingDesc":"1뚝배기(약 150g)","servingGrams":150,"kcal":140,"carb":2,"protein":12,"fat":9,"satfat":3,"sugar":1,"sodium":450,"fiber":0.1},{"name":"스팸구이","aliases":["스팸","런천미구이"],"servingDesc":"3~4쪽(약 90g)","servingGrams":90,"kcal":250,"carb":2,"protein":10,"fat":22,"satfat":8,"sugar":1,"sodium":900,"fiber":0},{"name":"돈까스","aliases":["돈가스"],"servingDesc":"1인분(약 200g)","servingGrams":200,"kcal":520,"carb":35,"protein":25,"fat":30,"satfat":7,"sugar":5,"sodium":700,"fiber":1.5},{"name":"닭갈비","aliases":[],"servingDesc":"1인분(약 300g)","servingGrams":300,"kcal":480,"carb":25,"protein":33,"fat":25,"satfat":6,"sugar":12,"sodium":1100,"fiber":2},{"name":"장조림","aliases":["소고기장조림"],"servingDesc":"1접시(약 60g)","servingGrams":60,"kcal":110,"carb":4,"protein":13,"fat":4,"satfat":1.5,"sugar":2,"sodium":550,"fiber":0.2},{"name":"동그랑땡","aliases":["동태전","고기완자전"],"servingDesc":"5개(약 100g)","servingGrams":100,"kcal":220,"carb":10,"protein":13,"fat":14,"satfat":4,"sugar":2,"sodium":400,"fiber":0.5},{"name":"소불고기전골","aliases":["불고기전골"],"servingDesc":"1인분(약 350g)","servingGrams":350,"kcal":350,"carb":15,"protein":25,"fat":20,"satfat":7,"sugar":6,"sodium":1000,"fiber":2},{"name":"메추리알조림","aliases":["메추리알장조림"],"servingDesc":"1접시(약 80g)","servingGrams":80,"kcal":130,"carb":5,"protein":10,"fat":8,"satfat":2.5,"sugar":3,"sodium":450,"fiber":0.1},{"name":"두부부침","aliases":["부침두부","구운두부"],"servingDesc":"1접시(약 100g)","servingGrams":100,"kcal":160,"carb":3,"protein":10,"fat":12,"satfat":2,"sugar":1,"sodium":350,"fiber":1},{"name":"오리불고기","aliases":["오리로스구이"],"servingDesc":"1인분(약 200g)","servingGrams":200,"kcal":430,"carb":10,"protein":24,"fat":32,"satfat":9,"sugar":5,"sodium":700,"fiber":1},{"name":"소갈비구이","aliases":["LA갈비구이"],"servingDesc":"1인분(약 200g)","servingGrams":200,"kcal":520,"carb":8,"protein":28,"fat":42,"satfat":16,"sugar":5,"sodium":650,"fiber":0.3},{"name":"닭가슴살구이","aliases":["닭가슴살스테이크"],"servingDesc":"1조각(약 150g)","servingGrams":150,"kcal":230,"carb":2,"protein":38,"fat":7,"satfat":2,"sugar":1,"sodium":450,"fiber":0.2},{"name":"고등어구이","aliases":["고등어소금구이"],"servingDesc":"1토막(약 100g)","servingGrams":100,"kcal":215,"carb":0,"protein":20,"fat":14,"satfat":3.5,"sugar":0,"sodium":320,"fiber":0},{"name":"갈치조림","aliases":["갈치찜"],"servingDesc":"1인분(갈치 1토막+양념, 약 200g)","servingGrams":200,"kcal":280,"carb":10,"protein":24,"fat":16,"satfat":3,"sugar":6,"sodium":980,"fiber":1.5},{"name":"고등어조림","aliases":[],"servingDesc":"1인분(약 200g)","servingGrams":200,"kcal":300,"carb":9,"protein":22,"fat":19,"satfat":4,"sugar":5,"sodium":950,"fiber":1.5},{"name":"오징어볶음","aliases":[],"servingDesc":"1접시(약 150g)","servingGrams":150,"kcal":230,"carb":16,"protein":18,"fat":10,"satfat":1.5,"sugar":8,"sodium":780,"fiber":2},{"name":"낙지볶음","aliases":["산낙지볶음"],"servingDesc":"1접시(약 180g)","servingGrams":180,"kcal":260,"carb":18,"protein":20,"fat":11,"satfat":1.7,"sugar":9,"sodium":900,"fiber":2.5},{"name":"새우튀김","aliases":["튀김새우"],"servingDesc":"5개(약 120g)","servingGrams":120,"kcal":300,"carb":22,"protein":14,"fat":18,"satfat":2.5,"sugar":1,"sodium":420,"fiber":1},{"name":"조기구이","aliases":["굴비구이"],"servingDesc":"1마리(약 100g)","servingGrams":100,"kcal":180,"carb":0,"protein":19,"fat":11,"satfat":2.5,"sugar":0,"sodium":380,"fiber":0},{"name":"명태조림","aliases":["동태조림"],"servingDesc":"1인분(약 200g)","servingGrams":200,"kcal":220,"carb":12,"protein":22,"fat":8,"satfat":1.5,"sugar":6,"sodium":900,"fiber":1.5},{"name":"간장게장","aliases":["게장"],"servingDesc":"꽃게 1/2마리(약 150g, 살+국물)","servingGrams":150,"kcal":190,"carb":6,"protein":18,"fat":9,"satfat":1.5,"sugar":4,"sodium":1100,"fiber":0.3},{"name":"연어스테이크","aliases":["연어구이","훈제연어구이"],"servingDesc":"1인분(약 150g)","servingGrams":150,"kcal":320,"carb":2,"protein":30,"fat":21,"satfat":4,"sugar":1,"sodium":300,"fiber":0},{"name":"참치캔(살코기)","aliases":["참치통조림","동원참치"],"servingDesc":"1캔(약 100g, 기름 제거)","servingGrams":100,"kcal":140,"carb":0,"protein":24,"fat":5,"satfat":1,"sugar":0,"sodium":300,"fiber":0},{"name":"고등어김치찜","aliases":["김치고등어조림"],"servingDesc":"1인분(약 220g)","servingGrams":220,"kcal":260,"carb":10,"protein":20,"fat":15,"satfat":3,"sugar":4,"sodium":1000,"fiber":2},{"name":"장어구이","aliases":["민물장어구이","붕장어구이"],"servingDesc":"1인분(약 150g)","servingGrams":150,"kcal":380,"carb":8,"protein":24,"fat":27,"satfat":6,"sugar":6,"sodium":500,"fiber":0.2},{"name":"생선까스","aliases":["생선가스","피쉬까스"],"servingDesc":"1인분(약 150g)","servingGrams":150,"kcal":380,"carb":28,"protein":18,"fat":21,"satfat":3.5,"sugar":3,"sodium":650,"fiber":1},{"name":"오징어젓갈","aliases":["오징어젓"],"servingDesc":"1접시(약 50g)","servingGrams":50,"kcal":70,"carb":4,"protein":9,"fat":2,"satfat":0.3,"sugar":2,"sodium":700,"fiber":0.3},{"name":"코다리조림","aliases":["코다리찜"],"servingDesc":"1인분(약 200g)","servingGrams":200,"kcal":260,"carb":14,"protein":22,"fat":11,"satfat":2,"sugar":7,"sodium":950,"fiber":1.5},{"name":"게살볶음밥","aliases":["크래미볶음밥"],"servingDesc":"1공기(약 300g)","servingGrams":300,"kcal":520,"carb":78,"protein":14,"fat":16,"satfat":3,"sugar":4,"sodium":900,"fiber":2},{"name":"물회","aliases":["회무침물회"],"servingDesc":"1그릇(약 500g, 밥 포함)","servingGrams":500,"kcal":420,"carb":60,"protein":28,"fat":6,"satfat":1,"sugar":18,"sodium":1200,"fiber":3},{"name":"광어회","aliases":["우럭회"],"servingDesc":"1인분(약 150g)","servingGrams":150,"kcal":160,"carb":0,"protein":30,"fat":3.5,"satfat":0.7,"sugar":0,"sodium":80,"fiber":0},{"name":"굴전","aliases":["굴부침개"],"servingDesc":"1접시(약 120g)","servingGrams":120,"kcal":230,"carb":14,"protein":12,"fat":14,"satfat":2.5,"sugar":1,"sodium":450,"fiber":1},{"name":"칵테일새우볶음","aliases":["새우볶음"],"servingDesc":"1접시(약 100g)","servingGrams":100,"kcal":150,"carb":4,"protein":18,"fat":6,"satfat":1,"sugar":1,"sodium":500,"fiber":0.3},{"name":"삼치구이","aliases":["삼치소금구이"],"servingDesc":"1토막(약 100g)","servingGrams":100,"kcal":200,"carb":0,"protein":20,"fat":13,"satfat":3,"sugar":0,"sodium":300,"fiber":0},{"name":"매운탕(생선탕)","aliases":["동태탕"],"servingDesc":"1인분(약 400g)","servingGrams":400,"kcal":220,"carb":10,"protein":25,"fat":8,"satfat":1.5,"sugar":3,"sodium":1300,"fiber":2},{"name":"떡볶이","aliases":["떡볶이 1인분","분식 떡볶이"],"servingDesc":"1인분(약 300g)","servingGrams":300,"kcal":420,"carb":80,"protein":9,"fat":6,"satfat":1.5,"sugar":20,"sodium":1300,"fiber":3},{"name":"순대","aliases":["모듬순대","찐순대"],"servingDesc":"1접시(약 200g)","servingGrams":200,"kcal":330,"carb":30,"protein":15,"fat":16,"satfat":5,"sugar":2,"sodium":700,"fiber":2},{"name":"모둠튀김","aliases":["튀김","분식 튀김"],"servingDesc":"1인분(약 150g, 5~6개)","servingGrams":150,"kcal":380,"carb":40,"protein":8,"fat":21,"satfat":3,"sugar":2,"sodium":550,"fiber":2},{"name":"탕수육","aliases":["소탕수육","탕수육 소자"],"servingDesc":"1인분(약 250g)","servingGrams":250,"kcal":600,"carb":55,"protein":20,"fat":32,"satfat":6,"sugar":15,"sodium":700,"fiber":2},{"name":"후라이드치킨","aliases":["프라이드치킨","후라이드"],"servingDesc":"3~4조각(약 300g)","servingGrams":300,"kcal":800,"carb":30,"protein":50,"fat":54,"satfat":11,"sugar":1,"sodium":900,"fiber":1},{"name":"양념치킨","aliases":["양념통닭"],"servingDesc":"3~4조각(약 300g)","servingGrams":300,"kcal":850,"carb":45,"protein":48,"fat":52,"satfat":11,"sugar":22,"sodium":1300,"fiber":1},{"name":"피자 한 조각","aliases":["피자슬라이스","페퍼로니피자"],"servingDesc":"1조각(약 130g)","servingGrams":130,"kcal":320,"carb":33,"protein":13,"fat":15,"satfat":6,"sugar":4,"sodium":700,"fiber":2},{"name":"햄버거","aliases":["치즈버거","패스트푸드버거"],"servingDesc":"1개(약 220g)","servingGrams":220,"kcal":540,"carb":42,"protein":25,"fat":30,"satfat":10,"sugar":8,"sodium":950,"fiber":2},{"name":"감자튀김","aliases":["프렌치프라이","후렌치후라이"],"servingDesc":"1인분(중, 약 130g)","servingGrams":130,"kcal":370,"carb":45,"protein":4,"fat":19,"satfat":3,"sugar":1,"sodium":350,"fiber":4},{"name":"초밥세트","aliases":["모둠초밥","스시세트"],"servingDesc":"1인분(약 300g, 12~15피스)","servingGrams":300,"kcal":550,"carb":90,"protein":25,"fat":8,"satfat":1.5,"sugar":8,"sodium":1300,"fiber":1},{"name":"불고기버거세트","aliases":["세트메뉴","버거세트"],"servingDesc":"1세트(버거+감자튀김+콜라)","servingGrams":500,"kcal":900,"carb":110,"protein":28,"fat":38,"satfat":11,"sugar":45,"sodium":1400,"fiber":4},{"name":"핫도그","aliases":["콘도그","길거리핫도그"],"servingDesc":"1개(약 130g)","servingGrams":130,"kcal":350,"carb":38,"protein":10,"fat":17,"satfat":6,"sugar":10,"sodium":700,"fiber":1},{"name":"닭강정","aliases":["코숄닭강정","닭강정세트"],"servingDesc":"1인분(약 250g)","servingGrams":250,"kcal":650,"carb":45,"protein":30,"fat":38,"satfat":8,"sugar":18,"sodium":1000,"fiber":1},{"name":"떡꼬치","aliases":["소스떡꼬치","불꼬치"],"servingDesc":"1개(약 100g)","servingGrams":100,"kcal":210,"carb":40,"protein":4,"fat":4,"satfat":1,"sugar":10,"sodium":400,"fiber":1},{"name":"사과","aliases":["사과 1개"],"servingDesc":"1개(약 200g)","servingGrams":200,"kcal":110,"carb":29,"protein":0.6,"fat":0.4,"satfat":0.1,"sugar":23,"sodium":2,"fiber":3.6},{"name":"바나나","aliases":[],"servingDesc":"1개(약 120g)","servingGrams":120,"kcal":100,"carb":26,"protein":1.2,"fat":0.3,"satfat":0.1,"sugar":14,"sodium":1,"fiber":2.6},{"name":"방울토마토","aliases":["대추방울토마토"],"servingDesc":"10알(약 150g)","servingGrams":150,"kcal":27,"carb":6,"protein":1.2,"fat":0.3,"satfat":0.05,"sugar":4,"sodium":8,"fiber":1.8},{"name":"우유","aliases":["흰우유"],"servingDesc":"1팩(200ml)","servingGrams":200,"kcal":130,"carb":9.6,"protein":6.6,"fat":7.2,"satfat":4.6,"sugar":9.6,"sodium":100,"fiber":0},{"name":"두유","aliases":["콩두유"],"servingDesc":"1팩(190ml)","servingGrams":190,"kcal":110,"carb":13,"protein":7,"fat":3.5,"satfat":0.5,"sugar":9,"sodium":95,"fiber":1.5},{"name":"아메리카노","aliases":["아이스아메리카노","americano"],"servingDesc":"1잔(355ml, Tall)","servingGrams":355,"kcal":10,"carb":2,"protein":0.5,"fat":0,"satfat":0,"sugar":0,"sodium":10,"fiber":0},{"name":"카페라떼","aliases":["라떼"],"servingDesc":"1잔(355ml, Tall)","servingGrams":355,"kcal":180,"carb":15,"protein":10,"fat":9,"satfat":5.5,"sugar":14,"sodium":140,"fiber":0},{"name":"플레인요거트","aliases":["떠먹는 요거트"],"servingDesc":"1개(100g)","servingGrams":100,"kcal":80,"carb":9,"protein":4,"fat":3,"satfat":2,"sugar":9,"sodium":50,"fiber":0},{"name":"그릭요거트","aliases":["그릭 요거트"],"servingDesc":"1컵(100g)","servingGrams":100,"kcal":100,"carb":5,"protein":10,"fat":4,"satfat":2.5,"sugar":4,"sodium":45,"fiber":0},{"name":"초코파이","aliases":["초코파이 1개"],"servingDesc":"1개(약 39g)","servingGrams":39,"kcal":165,"carb":24,"protein":1.8,"fat":6.5,"satfat":3.8,"sugar":16,"sodium":85,"fiber":0.8},{"name":"감자칩","aliases":["포테이토칩","과자"],"servingDesc":"1봉(작은 사이즈, 60g)","servingGrams":60,"kcal":330,"carb":33,"protein":3.6,"fat":21,"satfat":6.5,"sugar":1,"sodium":330,"fiber":2.4},{"name":"아이스크림","aliases":["콘아이스크림","바닐라아이스크림"],"servingDesc":"1개(콘, 약 100g)","servingGrams":100,"kcal":220,"carb":28,"protein":3.5,"fat":11,"satfat":6.5,"sugar":22,"sodium":70,"fiber":0.3},{"name":"에너지바","aliases":["프로틴바","단백질바"],"servingDesc":"1개(약 45g)","servingGrams":45,"kcal":180,"carb":20,"protein":10,"fat":7,"satfat":3.5,"sugar":8,"sodium":150,"fiber":3},{"name":"삶은 계란","aliases":["구운계란","달걀"],"servingDesc":"1개(50g)","servingGrams":50,"kcal":78,"carb":0.6,"protein":6.5,"fat":5.3,"satfat":1.7,"sugar":0.3,"sodium":62,"fiber":0},{"name":"믹스견과","aliases":["견과류","아몬드호두믹스"],"servingDesc":"1봉(소포장, 25g)","servingGrams":25,"kcal":150,"carb":6,"protein":5,"fat":13,"satfat":1.8,"sugar":1,"sodium":30,"fiber":2.2},{"name":"바나나우유","aliases":["단지 우유","가공유"],"servingDesc":"1병(240ml)","servingGrams":240,"kcal":190,"carb":33,"protein":6,"fat":4,"satfat":2.8,"sugar":30,"sodium":110,"fiber":0},{"name":"오렌지주스","aliases":["착즙주스","과일주스"],"servingDesc":"1팩(190ml)","servingGrams":190,"kcal":90,"carb":21,"protein":1,"fat":0.2,"satfat":0,"sugar":18,"sodium":10,"fiber":0.5},{"name":"탄산음료","aliases":["콜라","사이다"],"servingDesc":"1캔(250ml)","servingGrams":250,"kcal":105,"carb":27,"protein":0,"fat":0,"satfat":0,"sugar":27,"sodium":15,"fiber":0},{"name":"딸기","aliases":["딸기 한 컵"],"servingDesc":"1컵(150g)","servingGrams":150,"kcal":48,"carb":11,"protein":1,"fat":0.5,"satfat":0.03,"sugar":7,"sodium":2,"fiber":3},{"name":"곶감","aliases":["말린 감"],"servingDesc":"1개(약 50g)","servingGrams":50,"kcal":130,"carb":33,"protein":0.8,"fat":0.3,"satfat":0.05,"sugar":26,"sodium":2,"fiber":4},{"name":"치즈스틱","aliases":["모짜렐라치즈","string cheese"],"servingDesc":"1개(20g)","servingGrams":20,"kcal":65,"carb":0.5,"protein":5,"fat":5,"satfat":3.2,"sugar":0.3,"sodium":150,"fiber":0},{"name":"생크림케이크","aliases":["조각케이크"],"servingDesc":"1조각(약 100g)","servingGrams":100,"kcal":330,"carb":40,"protein":4,"fat":17,"satfat":10,"sugar":30,"sodium":180,"fiber":0.8},{"name":"사케동","aliases":["연어덮밥","サーモン丼","salmon don"],"cuisine":"일본","servingDesc":"1인분(약 450g)","servingGrams":450,"kcal":620,"carb":85,"protein":30,"fat":16,"satfat":3,"sugar":10,"sodium":900,"fiber":2},{"name":"규동","aliases":["소고기덮밥","牛丼","gyudon"],"cuisine":"일본","servingDesc":"1인분(약 450g)","servingGrams":450,"kcal":680,"carb":90,"protein":25,"fat":22,"satfat":8,"sugar":14,"sodium":1100,"fiber":2},{"name":"가츠동","aliases":["돈까스덮밥","カツ丼","katsudon"],"cuisine":"일본","servingDesc":"1인분(약 500g)","servingGrams":500,"kcal":830,"carb":95,"protein":32,"fat":33,"satfat":7,"sugar":12,"sodium":1300,"fiber":2.5},{"name":"오야코동","aliases":["닭고기달걀덮밥","親子丼","oyakodon"],"cuisine":"일본","servingDesc":"1인분(약 450g)","servingGrams":450,"kcal":600,"carb":85,"protein":28,"fat":15,"satfat":4,"sugar":9,"sodium":1050,"fiber":1.5},{"name":"돈코츠라멘","aliases":["돼지뼈라멘","豚骨ラーメン","tonkotsu ramen"],"cuisine":"일본","servingDesc":"1그릇(약 650g)","servingGrams":650,"kcal":650,"carb":70,"protein":28,"fat":26,"satfat":10,"sugar":4,"sodium":2200,"fiber":3},{"name":"미소라멘","aliases":["된장라멘","味噌ラーメン","miso ramen"],"cuisine":"일본","servingDesc":"1그릇(약 650g)","servingGrams":650,"kcal":600,"carb":75,"protein":24,"fat":18,"satfat":6,"sugar":6,"sodium":2100,"fiber":3.5},{"name":"우동","aliases":["가케우동","かけうどん","udon"],"cuisine":"일본","servingDesc":"1그릇(약 600g)","servingGrams":600,"kcal":400,"carb":78,"protein":13,"fat":3,"satfat":0.6,"sugar":4,"sodium":1600,"fiber":3},{"name":"소바","aliases":["자루소바","ざるそば","zaru soba"],"cuisine":"일본","servingDesc":"1인분(약 300g)","servingGrams":300,"kcal":330,"carb":63,"protein":13,"fat":2,"satfat":0.4,"sugar":3,"sodium":900,"fiber":3.5},{"name":"오코노미야키","aliases":["일본식부침개","お好み焼き","okonomiyaki"],"cuisine":"일본","servingDesc":"1인분(약 300g)","servingGrams":300,"kcal":550,"carb":45,"protein":20,"fat":32,"satfat":8,"sugar":9,"sodium":1200,"fiber":3},{"name":"타코야키","aliases":["문어빵","たこ焼き","takoyaki"],"cuisine":"일본","servingDesc":"8개(약 200g)","servingGrams":200,"kcal":380,"carb":42,"protein":12,"fat":18,"satfat":3.5,"sugar":6,"sodium":900,"fiber":1.5},{"name":"가라아게","aliases":["일본식치킨","唐揚げ","karaage"],"cuisine":"일본","servingDesc":"6~7조각(약 200g)","servingGrams":200,"kcal":460,"carb":18,"protein":28,"fat":30,"satfat":6,"sugar":2,"sodium":800,"fiber":0.5},{"name":"텐푸라","aliases":["일본식튀김","天ぷら","tempura moriawase"],"cuisine":"일본","servingDesc":"모둠 1인분(약 200g)","servingGrams":200,"kcal":420,"carb":32,"protein":16,"fat":26,"satfat":3,"sugar":2,"sodium":700,"fiber":2},{"name":"오니기리","aliases":["일본식주먹밥","おにぎり","onigiri"],"cuisine":"일본","servingDesc":"1개(약 110g)","servingGrams":110,"kcal":180,"carb":38,"protein":4,"fat":1.5,"satfat":0.3,"sugar":1,"sodium":350,"fiber":0.5},{"name":"다마고야키","aliases":["일본식달걀말이","卵焼き","tamagoyaki"],"cuisine":"일본","servingDesc":"4조각(약 100g)","servingGrams":100,"kcal":160,"carb":6,"protein":11,"fat":10,"satfat":3,"sugar":5,"sodium":420,"fiber":0},{"name":"우나기동","aliases":["장어덮밥","うな丼","unadon"],"cuisine":"일본","servingDesc":"1인분(약 400g)","servingGrams":400,"kcal":650,"carb":80,"protein":26,"fat":24,"satfat":6,"sugar":16,"sodium":950,"fiber":1},{"name":"몬자야키","aliases":["もんじゃ焼き","monjayaki"],"cuisine":"일본","servingDesc":"1인분(약 300g)","servingGrams":300,"kcal":420,"carb":40,"protein":16,"fat":22,"satfat":6,"sugar":6,"sodium":1100,"fiber":2.5},{"name":"스키야키","aliases":["일본식전골","すき焼き","sukiyaki"],"cuisine":"일본","servingDesc":"1인분(약 400g)","servingGrams":400,"kcal":480,"carb":22,"protein":28,"fat":30,"satfat":11,"sugar":14,"sodium":1300,"fiber":2},{"name":"샤부샤부","aliases":["일본식샤브샤브","しゃぶしゃぶ","shabu shabu"],"cuisine":"일본","servingDesc":"1인분(약 450g)","servingGrams":450,"kcal":420,"carb":18,"protein":32,"fat":24,"satfat":9,"sugar":4,"sodium":1000,"fiber":3},{"name":"멘치카츠","aliases":["다진고기커틀릿","メンチカツ","menchi katsu"],"cuisine":"일본","servingDesc":"1개(약 120g)","servingGrams":120,"kcal":320,"carb":18,"protein":13,"fat":21,"satfat":6,"sugar":2,"sodium":500,"fiber":1},{"name":"야키토리","aliases":["일본식꼬치구이","焼き鳥","yakitori"],"cuisine":"일본","servingDesc":"3꼬치(약 150g)","servingGrams":150,"kcal":280,"carb":8,"protein":24,"fat":17,"satfat":4.5,"sugar":6,"sodium":700,"fiber":0.3},{"name":"모츠나베","aliases":["곱창전골","もつ鍋","motsunabe"],"cuisine":"일본","servingDesc":"1인분(약 400g)","servingGrams":400,"kcal":460,"carb":16,"protein":26,"fat":32,"satfat":13,"sugar":5,"sodium":1400,"fiber":3},{"name":"차슈멘","aliases":["차슈라멘","チャーシュー麺","chashu ramen"],"cuisine":"일본","servingDesc":"1그릇(약 700g)","servingGrams":700,"kcal":720,"carb":72,"protein":34,"fat":30,"satfat":11,"sugar":5,"sodium":2300,"fiber":3},{"name":"오차즈케","aliases":["차밥","お茶漬け","ochazuke"],"cuisine":"일본","servingDesc":"1공기(약 350g)","servingGrams":350,"kcal":250,"carb":48,"protein":8,"fat":2.5,"satfat":0.5,"sugar":1,"sodium":900,"fiber":1},{"name":"멘타이코 파스타","aliases":["명란파스타","明太子パスタ","mentaiko pasta"],"cuisine":"일본","servingDesc":"1인분(약 350g)","servingGrams":350,"kcal":580,"carb":70,"protein":18,"fat":24,"satfat":8,"sugar":3,"sodium":1300,"fiber":2.5},{"name":"마파두부","aliases":["麻婆豆腐","마파도우푸"],"cuisine":"중국","servingDesc":"1인분(약 300g)","servingGrams":300,"kcal":380,"carb":12,"protein":18,"fat":28,"satfat":8,"sugar":3,"sodium":980,"fiber":2},{"name":"깐풍기","aliases":["干烹鷄","깐풍기닭"],"cuisine":"중국","servingDesc":"1인분(약 250g)","servingGrams":250,"kcal":560,"carb":32,"protein":30,"fat":34,"satfat":6,"sugar":18,"sodium":900,"fiber":1},{"name":"유린기","aliases":["油淋鷄","유린치"],"cuisine":"중국","servingDesc":"1인분(약 250g)","servingGrams":250,"kcal":480,"carb":22,"protein":28,"fat":30,"satfat":5,"sugar":12,"sodium":780,"fiber":1.5},{"name":"공심채볶음","aliases":["空心菜炒","콩신차이"],"cuisine":"중국","servingDesc":"1접시(약 200g)","servingGrams":200,"kcal":150,"carb":8,"protein":4,"fat":11,"satfat":1.5,"sugar":2,"sodium":560,"fiber":3},{"name":"딤섬(하가우)","aliases":["새우딤섬","蝦餃","하가우"],"cuisine":"중국","servingDesc":"4개(약 140g)","servingGrams":140,"kcal":180,"carb":22,"protein":9,"fat":6,"satfat":1.5,"sugar":1,"sodium":520,"fiber":1},{"name":"샤오롱바오","aliases":["小籠包","소룡포"],"cuisine":"중국","servingDesc":"5개(약 150g)","servingGrams":150,"kcal":320,"carb":30,"protein":13,"fat":16,"satfat":6,"sugar":2,"sodium":680,"fiber":1.5},{"name":"볶음면(차오미엔)","aliases":["炒麵","차오면"],"cuisine":"중국","servingDesc":"1인분(약 350g)","servingGrams":350,"kcal":520,"carb":68,"protein":18,"fat":18,"satfat":3.5,"sugar":6,"sodium":1150,"fiber":3},{"name":"훈툰탕","aliases":["餛飩湯","완탕탕","완탕수프"],"cuisine":"중국","servingDesc":"1인분(약 400g)","servingGrams":400,"kcal":260,"carb":24,"protein":16,"fat":10,"satfat":3,"sugar":2,"sodium":1100,"fiber":1.5},{"name":"북경오리","aliases":["베이징덕","北京烤鴨"],"cuisine":"중국","servingDesc":"3~4쪽(약 150g)","servingGrams":150,"kcal":420,"carb":10,"protein":22,"fat":32,"satfat":10,"sugar":3,"sodium":560,"fiber":0.5},{"name":"궁보계정","aliases":["宮保鷄丁","꽁바오지딩","궁보기딩"],"cuisine":"중국","servingDesc":"1인분(약 280g)","servingGrams":280,"kcal":460,"carb":22,"protein":28,"fat":28,"satfat":5,"sugar":10,"sodium":920,"fiber":2},{"name":"라조기","aliases":["辣椒鷄","라조육"],"cuisine":"중국","servingDesc":"1인분(약 280g)","servingGrams":280,"kcal":500,"carb":24,"protein":26,"fat":32,"satfat":6,"sugar":8,"sodium":880,"fiber":2},{"name":"동파육","aliases":["東坡肉","둥포러우"],"cuisine":"중국","servingDesc":"2~3쪽(약 180g)","servingGrams":180,"kcal":620,"carb":14,"protein":24,"fat":52,"satfat":20,"sugar":10,"sodium":760,"fiber":0.5},{"name":"우육면","aliases":["牛肉麵","뉴러우몐","소고기탕면"],"cuisine":"중국","servingDesc":"1인분(약 550g)","servingGrams":550,"kcal":580,"carb":68,"protein":32,"fat":18,"satfat":6,"sugar":4,"sodium":1450,"fiber":3},{"name":"마라탕","aliases":["麻辣燙"],"cuisine":"중국","servingDesc":"1인분(약 600g)","servingGrams":600,"kcal":520,"carb":38,"protein":26,"fat":28,"satfat":8,"sugar":5,"sodium":1900,"fiber":5},{"name":"마라샹궈","aliases":["麻辣香鍋"],"cuisine":"중국","servingDesc":"1인분(약 400g)","servingGrams":400,"kcal":560,"carb":22,"protein":28,"fat":38,"satfat":9,"sugar":4,"sodium":1650,"fiber":4},{"name":"양장피","aliases":["洋張皮","양장피잡채"],"cuisine":"중국","servingDesc":"1인분(약 350g)","servingGrams":350,"kcal":420,"carb":40,"protein":20,"fat":18,"satfat":3,"sugar":8,"sodium":900,"fiber":3},{"name":"물만두","aliases":["水餃子","수교자"],"cuisine":"중국","servingDesc":"8개(약 320g)","servingGrams":320,"kcal":420,"carb":48,"protein":18,"fat":16,"satfat":5,"sugar":2,"sodium":880,"fiber":2.5},{"name":"고추잡채(칭자오러우쓰)","aliases":["青椒肉絲","청초육사"],"cuisine":"중국","servingDesc":"1인분(약 250g)","servingGrams":250,"kcal":320,"carb":14,"protein":20,"fat":20,"satfat":5,"sugar":5,"sodium":760,"fiber":2},{"name":"멘보샤","aliases":["蝦多士","새우토스트"],"cuisine":"중국","servingDesc":"2조각(약 150g)","servingGrams":150,"kcal":420,"carb":32,"protein":14,"fat":26,"satfat":5,"sugar":3,"sodium":520,"fiber":1.5},{"name":"팔보채","aliases":["八寶菜","팔보채볶음"],"cuisine":"중국","servingDesc":"1인분(약 350g)","servingGrams":350,"kcal":340,"carb":18,"protein":24,"fat":18,"satfat":3,"sugar":5,"sodium":980,"fiber":3},{"name":"난자완스","aliases":["南煎丸子"],"cuisine":"중국","servingDesc":"2개(약 200g)","servingGrams":200,"kcal":420,"carb":14,"protein":22,"fat":30,"satfat":9,"sugar":5,"sodium":760,"fiber":1.5},{"name":"자차이(짜사이)무침","aliases":["榨菜","자차이"],"cuisine":"중국","servingDesc":"1접시(약 60g)","servingGrams":60,"kcal":40,"carb":6,"protein":1.5,"fat":1.2,"satfat":0.2,"sugar":2,"sodium":620,"fiber":1.5},{"name":"부추잡채","aliases":["韭菜炒","부추볶음"],"cuisine":"중국","servingDesc":"1접시(약 200g)","servingGrams":200,"kcal":220,"carb":10,"protein":8,"fat":16,"satfat":2.5,"sugar":3,"sodium":560,"fiber":3},{"name":"토마토계란볶음","aliases":["西紅柿炒鷄蛋","시홍스차오지단"],"cuisine":"중국","servingDesc":"1접시(약 250g)","servingGrams":250,"kcal":260,"carb":12,"protein":14,"fat":18,"satfat":4,"sugar":8,"sodium":580,"fiber":2},{"name":"고기왕만두찜","aliases":["蒸餃","찐만두"],"cuisine":"중국","servingDesc":"6개(약 300g)","servingGrams":300,"kcal":460,"carb":50,"protein":20,"fat":20,"satfat":6,"sugar":3,"sodium":820,"fiber":2.5},{"name":"마르게리타피자","aliases":["Pizza Margherita","마게리따피자"],"cuisine":"이탈리아","servingDesc":"1인분(약 1/2판, 200g)","servingGrams":200,"kcal":480,"carb":56,"protein":19,"fat":19,"satfat":8,"sugar":5,"sodium":980,"fiber":3},{"name":"라자냐","aliases":["Lasagna","라자니아"],"cuisine":"이탈리아","servingDesc":"1인분(약 300g)","servingGrams":300,"kcal":420,"carb":34,"protein":24,"fat":21,"satfat":10,"sugar":8,"sodium":870,"fiber":3},{"name":"리조또(버섯)","aliases":["Risotto","버섯리조토"],"cuisine":"이탈리아","servingDesc":"1접시(약 280g)","servingGrams":280,"kcal":430,"carb":58,"protein":10,"fat":16,"satfat":8,"sugar":3,"sodium":760,"fiber":3},{"name":"뇨끼","aliases":["Gnocchi","감자뇨끼"],"cuisine":"이탈리아","servingDesc":"1접시(약 250g)","servingGrams":250,"kcal":380,"carb":56,"protein":10,"fat":12,"satfat":6,"sugar":3,"sodium":720,"fiber":3},{"name":"카르보나라","aliases":["Carbonara","까르보나라"],"cuisine":"이탈리아","servingDesc":"1접시(약 300g)","servingGrams":300,"kcal":650,"carb":62,"protein":24,"fat":34,"satfat":16,"sugar":3,"sodium":900,"fiber":2},{"name":"알리오올리오","aliases":["Aglio e Olio","알리오에올리오"],"cuisine":"이탈리아","servingDesc":"1접시(약 280g)","servingGrams":280,"kcal":460,"carb":62,"protein":11,"fat":17,"satfat":2.5,"sugar":2,"sodium":520,"fiber":3},{"name":"티라미수","aliases":["Tiramisu"],"cuisine":"이탈리아","servingDesc":"1조각(약 120g)","servingGrams":120,"kcal":330,"carb":30,"protein":6,"fat":21,"satfat":12,"sugar":24,"sodium":90,"fiber":1},{"name":"카프레제샐러드","aliases":["Caprese Salad","까프레제"],"cuisine":"이탈리아","servingDesc":"1접시(약 200g)","servingGrams":200,"kcal":260,"carb":8,"protein":14,"fat":19,"satfat":9,"sugar":5,"sodium":420,"fiber":2},{"name":"미네스트로네","aliases":["Minestrone Soup"],"cuisine":"이탈리아","servingDesc":"1그릇(약 300g)","servingGrams":300,"kcal":150,"carb":24,"protein":6,"fat":4,"satfat":1,"sugar":6,"sodium":780,"fiber":6},{"name":"오소부코","aliases":["Osso Buco"],"cuisine":"이탈리아","servingDesc":"1인분(약 280g, 소스포함)","servingGrams":280,"kcal":420,"carb":10,"protein":38,"fat":24,"satfat":8,"sugar":4,"sodium":800,"fiber":2},{"name":"브루스케타","aliases":["Bruschetta"],"cuisine":"이탈리아","servingDesc":"2쪽(약 100g)","servingGrams":100,"kcal":180,"carb":22,"protein":4,"fat":8,"satfat":1.5,"sugar":3,"sodium":320,"fiber":2},{"name":"파니니","aliases":["Panini"],"cuisine":"이탈리아","servingDesc":"1개(약 200g)","servingGrams":200,"kcal":420,"carb":40,"protein":20,"fat":20,"satfat":9,"sugar":4,"sodium":950,"fiber":2},{"name":"살팀보카","aliases":["Saltimbocca alla Romana"],"cuisine":"이탈리아","servingDesc":"1인분(약 220g)","servingGrams":220,"kcal":380,"carb":4,"protein":34,"fat":25,"satfat":9,"sugar":1,"sodium":900,"fiber":0},{"name":"페스토파스타","aliases":["Pasta al Pesto","제노바페스토"],"cuisine":"이탈리아","servingDesc":"1접시(약 300g)","servingGrams":300,"kcal":520,"carb":60,"protein":14,"fat":24,"satfat":5,"sugar":3,"sodium":680,"fiber":3},{"name":"라비올리","aliases":["Ravioli"],"cuisine":"이탈리아","servingDesc":"1접시(약 250g)","servingGrams":250,"kcal":400,"carb":48,"protein":16,"fat":16,"satfat":7,"sugar":4,"sodium":760,"fiber":3},{"name":"타코(소고기)","aliases":["Taco","비프타코"],"cuisine":"멕시코","servingDesc":"1개(약 90g)","servingGrams":90,"kcal":170,"carb":13,"protein":9,"fat":9,"satfat":3.5,"sugar":1,"sodium":310,"fiber":1.5},{"name":"치킨부리또","aliases":["Burrito","치킨 부리토"],"cuisine":"멕시코","servingDesc":"1개(약 300g)","servingGrams":300,"kcal":560,"carb":65,"protein":28,"fat":21,"satfat":8,"sugar":4,"sodium":1200,"fiber":8},{"name":"퀘사디아(치즈)","aliases":["Quesadilla"],"cuisine":"멕시코","servingDesc":"1개(약 180g)","servingGrams":180,"kcal":450,"carb":34,"protein":20,"fat":26,"satfat":13,"sugar":2,"sodium":820,"fiber":3},{"name":"나초(치즈)","aliases":["Nachos"],"cuisine":"멕시코","servingDesc":"1접시(약 200g)","servingGrams":200,"kcal":480,"carb":46,"protein":13,"fat":28,"satfat":10,"sugar":3,"sodium":760,"fiber":4},{"name":"과카몰레","aliases":["Guacamole"],"cuisine":"멕시코","servingDesc":"약 100g(디핑소스용)","servingGrams":100,"kcal":150,"carb":9,"protein":2,"fat":13,"satfat":2,"sugar":1,"sodium":210,"fiber":6.5},{"name":"치킨엔칠라다","aliases":["Enchilada"],"cuisine":"멕시코","servingDesc":"2개(약 250g)","servingGrams":250,"kcal":420,"carb":36,"protein":24,"fat":20,"satfat":9,"sugar":5,"sodium":980,"fiber":5},{"name":"치킨파히타","aliases":["Fajitas"],"cuisine":"멕시코","servingDesc":"1인분(약 350g, 토르티야 포함)","servingGrams":350,"kcal":520,"carb":45,"protein":35,"fat":22,"satfat":6,"sugar":6,"sodium":1050,"fiber":6},{"name":"살사소스","aliases":["Salsa"],"cuisine":"멕시코","servingDesc":"약 60g(디핑소스용)","servingGrams":60,"kcal":25,"carb":5,"protein":1,"fat":0.3,"satfat":0,"sugar":3,"sodium":260,"fiber":1.5},{"name":"타말레","aliases":["Tamale"],"cuisine":"멕시코","servingDesc":"1개(약 150g)","servingGrams":150,"kcal":270,"carb":28,"protein":8,"fat":15,"satfat":5,"sugar":2,"sodium":420,"fiber":3},{"name":"칠리콘카르네","aliases":["Chili con carne"],"cuisine":"멕시코","servingDesc":"1접시(약 300g)","servingGrams":300,"kcal":380,"carb":28,"protein":26,"fat":18,"satfat":7,"sugar":6,"sodium":900,"fiber":9},{"name":"추로스","aliases":["Churros"],"cuisine":"멕시코","servingDesc":"3개(약 90g)","servingGrams":90,"kcal":330,"carb":42,"protein":4,"fat":16,"satfat":6,"sugar":18,"sodium":210,"fiber":1.5},{"name":"몰레포요","aliases":["Mole poblano","몰레 소스 치킨"],"cuisine":"멕시코","servingDesc":"1인분(닭다리1+소스, 약 280g)","servingGrams":280,"kcal":460,"carb":22,"protein":32,"fat":27,"satfat":8,"sugar":9,"sodium":680,"fiber":4},{"name":"토스타다","aliases":["Tostada"],"cuisine":"멕시코","servingDesc":"1개(약 150g)","servingGrams":150,"kcal":260,"carb":24,"protein":11,"fat":13,"satfat":4,"sugar":2,"sodium":450,"fiber":4},{"name":"치즈퀘소딥","aliases":["Queso dip","케소딥"],"cuisine":"멕시코","servingDesc":"약 80g(디핑소스용)","servingGrams":80,"kcal":220,"carb":6,"protein":9,"fat":18,"satfat":10,"sugar":2,"sodium":540,"fiber":0.5},{"name":"포솔레","aliases":["Pozole"],"cuisine":"멕시코","servingDesc":"1대접(약 400g)","servingGrams":400,"kcal":320,"carb":30,"protein":22,"fat":13,"satfat":4,"sugar":3,"sodium":950,"fiber":5},{"name":"치킨플라우타","aliases":["Flautas","타키토스"],"cuisine":"멕시코","servingDesc":"3개(약 150g)","servingGrams":150,"kcal":340,"carb":26,"protein":15,"fat":20,"satfat":6,"sugar":1,"sodium":520,"fiber":2},{"name":"우에보스란체로스","aliases":["Huevos rancheros"],"cuisine":"멕시코","servingDesc":"1인분(계란2개, 약 280g)","servingGrams":280,"kcal":420,"carb":28,"protein":20,"fat":26,"satfat":8,"sugar":4,"sodium":680,"fiber":5},{"name":"멕시칸라이스","aliases":["Mexican rice","아로스로호"],"cuisine":"멕시코","servingDesc":"1공기(약 180g)","servingGrams":180,"kcal":260,"carb":45,"protein":5,"fat":6,"satfat":1,"sugar":3,"sodium":480,"fiber":2},{"name":"프리홀레스(멕시칸콩요리)","aliases":["Refried beans","리프라이드빈"],"cuisine":"멕시코","servingDesc":"약 150g","servingGrams":150,"kcal":180,"carb":24,"protein":9,"fat":5,"satfat":1.5,"sugar":1,"sodium":480,"fiber":8},{"name":"토르타(멕시칸샌드위치)","aliases":["Torta"],"cuisine":"멕시코","servingDesc":"1개(약 280g)","servingGrams":280,"kcal":560,"carb":52,"protein":26,"fat":28,"satfat":9,"sugar":5,"sodium":1100,"fiber":5},{"name":"세비체","aliases":["Ceviche"],"cuisine":"멕시코","servingDesc":"1접시(약 200g)","servingGrams":200,"kcal":180,"carb":14,"protein":20,"fat":4,"satfat":0.5,"sugar":4,"sodium":420,"fiber":2},{"name":"엘로테(멕시칸옥수수구이)","aliases":["Elote","멕시칸 콘"],"cuisine":"멕시코","servingDesc":"1개(약 150g)","servingGrams":150,"kcal":220,"carb":22,"protein":6,"fat":13,"satfat":4,"sugar":6,"sodium":330,"fiber":3},{"name":"플랑(멕시칸푸딩)","aliases":["Flan","카라멜커스터드"],"cuisine":"멕시코","servingDesc":"1조각(약 120g)","servingGrams":120,"kcal":260,"carb":38,"protein":6,"fat":9,"satfat":4,"sugar":34,"sodium":90,"fiber":0},{"name":"팟타이 (Pad Thai)","aliases":["팟타이","Phad Thai"],"cuisine":"태국","servingDesc":"1접시(약 350g)","servingGrams":350,"kcal":530,"carb":65,"protein":18,"fat":21,"satfat":5,"sugar":12,"sodium":1100,"fiber":3},{"name":"쌀국수(포보) (Phở Bò)","aliases":["포","Pho Bo","베트남쌀국수"],"cuisine":"베트남","servingDesc":"1그릇(약 500g)","servingGrams":500,"kcal":420,"carb":55,"protein":25,"fat":9,"satfat":3,"sugar":4,"sodium":1400,"fiber":2},{"name":"똠양꿍 (Tom Yum Goong)","aliases":["똠얌꿍","Tom Yum Kung"],"cuisine":"태국","servingDesc":"1그릇(약 400g)","servingGrams":400,"kcal":180,"carb":10,"protein":16,"fat":8,"satfat":2,"sugar":4,"sodium":1300,"fiber":1.5},{"name":"반미 (Bánh mì)","aliases":["베트남샌드위치","Banh Mi"],"cuisine":"베트남","servingDesc":"1개(약 250g)","servingGrams":250,"kcal":480,"carb":58,"protein":20,"fat":18,"satfat":5,"sugar":6,"sodium":1050,"fiber":3},{"name":"나시고렝 (Nasi Goreng)","aliases":["인도네시아볶음밥"],"cuisine":"인도네시아","servingDesc":"1접시(약 350g)","servingGrams":350,"kcal":550,"carb":70,"protein":18,"fat":22,"satfat":5,"sugar":6,"sodium":1150,"fiber":3},{"name":"사테 (Satay)","aliases":["사떼","Sate","Satay Ayam"],"cuisine":"인도네시아","servingDesc":"꼬치 5개(약 150g, 소스포함)","servingGrams":150,"kcal":320,"carb":10,"protein":25,"fat":20,"satfat":5,"sugar":6,"sodium":600,"fiber":1},{"name":"월남쌈(스프링롤) (Gỏi cuốn)","aliases":["생춘권","Fresh Spring Roll","고이꾸온"],"cuisine":"베트남","servingDesc":"2개(약 160g, 소스포함)","servingGrams":160,"kcal":180,"carb":25,"protein":10,"fat":4,"satfat":1,"sugar":5,"sodium":500,"fiber":2},{"name":"카오팟 (Khao Pad)","aliases":["태국식볶음밥","Thai Fried Rice"],"cuisine":"태국","servingDesc":"1접시(약 350g)","servingGrams":350,"kcal":520,"carb":68,"protein":16,"fat":20,"satfat":4,"sugar":4,"sodium":1000,"fiber":2},{"name":"그린커리 (Gaeng Keow Wan)","aliases":["그린카레","Green Curry"],"cuisine":"태국","servingDesc":"1인분(밥 제외, 약 300g)","servingGrams":300,"kcal":380,"carb":12,"protein":18,"fat":30,"satfat":20,"sugar":6,"sodium":900,"fiber":3},{"name":"미고랭 (Mie Goreng)","aliases":["인도네시아볶음면"],"cuisine":"인도네시아","servingDesc":"1접시(약 350g)","servingGrams":350,"kcal":540,"carb":72,"protein":16,"fat":20,"satfat":5,"sugar":8,"sodium":1200,"fiber":3},{"name":"룸피아 (Lumpia)","aliases":["인도네시아튀김춘권"],"cuisine":"인도네시아","servingDesc":"3개(약 150g)","servingGrams":150,"kcal":330,"carb":30,"protein":10,"fat":19,"satfat":4,"sugar":2,"sodium":650,"fiber":2},{"name":"락사 (Laksa)","aliases":["말레이시아락사","인도네시아락사"],"cuisine":"인도네시아","servingDesc":"1그릇(약 450g)","servingGrams":450,"kcal":480,"carb":45,"protein":20,"fat":25,"satfat":15,"sugar":6,"sodium":1300,"fiber":3},{"name":"쏨땀 (Som Tam)","aliases":["파파야샐러드","Green Papaya Salad"],"cuisine":"태국","servingDesc":"1접시(약 200g)","servingGrams":200,"kcal":140,"carb":22,"protein":4,"fat":5,"satfat":1,"sugar":14,"sodium":900,"fiber":3},{"name":"분짜 (Bún chả)","aliases":["하노이불고기국수"],"cuisine":"베트남","servingDesc":"1인분(약 450g)","servingGrams":450,"kcal":520,"carb":55,"protein":28,"fat":20,"satfat":7,"sugar":10,"sodium":1300,"fiber":3},{"name":"카오소이 (Khao Soi)","aliases":["코코넛커리국수","Khao Soi"],"cuisine":"태국","servingDesc":"1그릇(약 450g)","servingGrams":450,"kcal":560,"carb":55,"protein":22,"fat":28,"satfat":18,"sugar":6,"sodium":1200,"fiber":3},{"name":"소토아얌 (Soto Ayam)","aliases":["인도네시아닭고기수프"],"cuisine":"인도네시아","servingDesc":"1그릇(약 400g)","servingGrams":400,"kcal":280,"carb":25,"protein":18,"fat":12,"satfat":4,"sugar":3,"sodium":1100,"fiber":2},{"name":"른당 (Rendang)","aliases":["소고기른당","Beef Rendang"],"cuisine":"인도네시아","servingDesc":"1인분(밥 제외, 약 200g)","servingGrams":200,"kcal":420,"carb":8,"protein":24,"fat":33,"satfat":22,"sugar":4,"sodium":700,"fiber":2},{"name":"가도가도 (Gado-Gado)","aliases":["인도네시아땅콩소스샐러드"],"cuisine":"인도네시아","servingDesc":"1접시(약 300g)","servingGrams":300,"kcal":380,"carb":28,"protein":14,"fat":24,"satfat":5,"sugar":8,"sodium":700,"fiber":6},{"name":"넴잔 (Nem rán/Chả giò)","aliases":["베트남튀김춘권","Cha Gio"],"cuisine":"베트남","servingDesc":"4개(약 160g)","servingGrams":160,"kcal":350,"carb":30,"protein":12,"fat":20,"satfat":4,"sugar":2,"sodium":700,"fiber":2},{"name":"분보후에 (Bún bò Huế)","aliases":["후에소고기국수"],"cuisine":"베트남","servingDesc":"1그릇(약 500g)","servingGrams":500,"kcal":480,"carb":50,"protein":26,"fat":18,"satfat":6,"sugar":5,"sodium":1500,"fiber":3},{"name":"아얌고렝 (Ayam Goreng)","aliases":["인도네시아치킨튀김"],"cuisine":"인도네시아","servingDesc":"1조각(약 180g)","servingGrams":180,"kcal":400,"carb":10,"protein":28,"fat":28,"satfat":7,"sugar":1,"sodium":650,"fiber":0.5},{"name":"팟씨유 (Pad See Ew)","aliases":["팟씨유우","Pad Si Ew"],"cuisine":"태국","servingDesc":"1접시(약 350g)","servingGrams":350,"kcal":540,"carb":62,"protein":20,"fat":22,"satfat":5,"sugar":8,"sodium":1200,"fiber":2},{"name":"마사만커리 (Massaman Curry)","aliases":["마사만카레"],"cuisine":"태국","servingDesc":"1인분(밥 제외, 약 300g)","servingGrams":300,"kcal":400,"carb":18,"protein":18,"fat":30,"satfat":18,"sugar":8,"sodium":850,"fiber":3},{"name":"바인쌔오 (Bánh xèo)","aliases":["베트남크레페","베트남부침개"],"cuisine":"베트남","servingDesc":"1장(약 250g)","servingGrams":250,"kcal":460,"carb":40,"protein":16,"fat":26,"satfat":10,"sugar":4,"sodium":800,"fiber":3},{"name":"버터치킨","aliases":["Butter Chicken","Murgh Makhani"],"cuisine":"인도","servingDesc":"1인분(약 250g, 소스+치킨)","servingGrams":250,"kcal":420,"carb":10,"protein":28,"fat":29,"satfat":13,"sugar":6,"sodium":780,"fiber":1.5},{"name":"치킨티카마살라","aliases":["Chicken Tikka Masala"],"cuisine":"인도","servingDesc":"1인분(약 250g)","servingGrams":250,"kcal":400,"carb":12,"protein":29,"fat":26,"satfat":10,"sugar":7,"sodium":820,"fiber":2},{"name":"달커리(렌틸콩커리)","aliases":["Dal","Daal","Dal Tadka"],"cuisine":"인도","servingDesc":"1인분(약 200g)","servingGrams":200,"kcal":220,"carb":26,"protein":11,"fat":8,"satfat":3,"sugar":3,"sodium":540,"fiber":7},{"name":"난","aliases":["Naan"],"cuisine":"인도","servingDesc":"1장(약 90g)","servingGrams":90,"kcal":270,"carb":45,"protein":8,"fat":6,"satfat":2,"sugar":3,"sodium":430,"fiber":2},{"name":"갈릭난","aliases":["Garlic Naan"],"cuisine":"인도","servingDesc":"1장(약 100g)","servingGrams":100,"kcal":310,"carb":47,"protein":9,"fat":9,"satfat":3,"sugar":3,"sodium":460,"fiber":2},{"name":"탄두리치킨","aliases":["Tandoori Chicken"],"cuisine":"인도","servingDesc":"1인분(다리+가슴 약 200g)","servingGrams":200,"kcal":300,"carb":4,"protein":34,"fat":16,"satfat":4,"sugar":2,"sodium":680,"fiber":0.5},{"name":"치킨비리야니","aliases":["Chicken Biryani"],"cuisine":"인도","servingDesc":"1공기(약 350g)","servingGrams":350,"kcal":560,"carb":68,"protein":26,"fat":20,"satfat":6,"sugar":4,"sodium":900,"fiber":3},{"name":"베지터블비리야니","aliases":["Vegetable Biryani"],"cuisine":"인도","servingDesc":"1공기(약 350g)","servingGrams":350,"kcal":480,"carb":72,"protein":10,"fat":16,"satfat":4,"sugar":5,"sodium":760,"fiber":5},{"name":"사모사","aliases":["Samosa"],"cuisine":"인도","servingDesc":"2개(약 100g)","servingGrams":100,"kcal":280,"carb":30,"protein":5,"fat":16,"satfat":5,"sugar":2,"sodium":420,"fiber":3},{"name":"팔락파니르","aliases":["Palak Paneer","Saag Paneer"],"cuisine":"인도","servingDesc":"1인분(약 220g)","servingGrams":220,"kcal":330,"carb":12,"protein":14,"fat":25,"satfat":13,"sugar":4,"sodium":600,"fiber":4},{"name":"파니르티카마살라","aliases":["Paneer Tikka Masala","Paneer Makhani"],"cuisine":"인도","servingDesc":"1인분(약 220g)","servingGrams":220,"kcal":420,"carb":14,"protein":16,"fat":32,"satfat":16,"sugar":6,"sodium":650,"fiber":2.5},{"name":"로건조쉬","aliases":["Rogan Josh"],"cuisine":"인도(카슈미르)","servingDesc":"1인분(양고기 약 220g)","servingGrams":220,"kcal":380,"carb":8,"protein":26,"fat":26,"satfat":10,"sugar":3,"sodium":700,"fiber":1.5},{"name":"차나마살라(병아리콩커리)","aliases":["Chana Masala","Chole"],"cuisine":"인도","servingDesc":"1인분(약 220g)","servingGrams":220,"kcal":280,"carb":38,"protein":11,"fat":9,"satfat":1.5,"sugar":6,"sodium":620,"fiber":9},{"name":"알루고비","aliases":["Aloo Gobi"],"cuisine":"인도","servingDesc":"1인분(약 200g)","servingGrams":200,"kcal":220,"carb":26,"protein":5,"fat":11,"satfat":1.5,"sugar":4,"sodium":480,"fiber":5},{"name":"머튼커리(양고기커리)","aliases":["Mutton Curry","Lamb Curry"],"cuisine":"인도","servingDesc":"1인분(약 250g)","servingGrams":250,"kcal":410,"carb":9,"protein":28,"fat":29,"satfat":11,"sugar":3,"sodium":720,"fiber":2},{"name":"비프반달루","aliases":["Beef Vindaloo"],"cuisine":"인도(고아)","servingDesc":"1인분(약 250g)","servingGrams":250,"kcal":380,"carb":10,"protein":27,"fat":25,"satfat":9,"sugar":4,"sodium":760,"fiber":1.5},{"name":"치킨65","aliases":["Chicken 65"],"cuisine":"인도(남인도)","servingDesc":"1인분(약 150g)","servingGrams":150,"kcal":330,"carb":15,"protein":22,"fat":20,"satfat":4,"sugar":3,"sodium":650,"fiber":1},{"name":"마살라도사","aliases":["Masala Dosa"],"cuisine":"인도(남인도)","servingDesc":"1장(약 200g)","servingGrams":200,"kcal":380,"carb":58,"protein":8,"fat":13,"satfat":2,"sugar":3,"sodium":540,"fiber":4},{"name":"이들리(삼발+처트니 포함)","aliases":["Idli","Idli Sambar"],"cuisine":"인도(남인도)","servingDesc":"이들리 3개+삼발+처트니(약 250g)","servingGrams":250,"kcal":260,"carb":45,"protein":9,"fat":5,"satfat":0.7,"sugar":4,"sodium":580,"fiber":6},{"name":"베지터블코르마","aliases":["Vegetable Korma"],"cuisine":"인도","servingDesc":"1인분(약 220g)","servingGrams":220,"kcal":320,"carb":22,"protein":6,"fat":23,"satfat":10,"sugar":6,"sodium":580,"fiber":4},{"name":"라이타(요거트샐러드)","aliases":["Raita"],"cuisine":"인도","servingDesc":"1인분(약 100g)","servingGrams":100,"kcal":70,"carb":6,"protein":3,"fat":3.5,"satfat":2,"sugar":5,"sodium":190,"fiber":0.8},{"name":"파파덤","aliases":["Papadum","Papad"],"cuisine":"인도","servingDesc":"2장(약 20g)","servingGrams":20,"kcal":90,"carb":12,"protein":4,"fat":3,"satfat":0.5,"sugar":0.5,"sodium":300,"fiber":1.5},{"name":"라씨(플레인)","aliases":["Lassi"],"cuisine":"인도","servingDesc":"1잔(약 250ml)","servingGrams":250,"kcal":150,"carb":18,"protein":6,"fat":6,"satfat":4,"sugar":16,"sodium":90,"fiber":0},{"name":"망고라씨","aliases":["Mango Lassi"],"cuisine":"인도","servingDesc":"1잔(약 250ml)","servingGrams":250,"kcal":220,"carb":38,"protein":6,"fat":5,"satfat":3,"sugar":34,"sodium":70,"fiber":1},{"name":"차이(밀크티)","aliases":["Chai","Masala Chai"],"cuisine":"인도","servingDesc":"1잔(약 200ml)","servingGrams":200,"kcal":110,"carb":16,"protein":3,"fat":3.5,"satfat":2,"sugar":14,"sodium":40,"fiber":0},{"name":"굴랍자문","aliases":["Gulab Jamun"],"cuisine":"인도","servingDesc":"2개(약 80g)","servingGrams":80,"kcal":260,"carb":38,"protein":4,"fat":10,"satfat":5,"sugar":32,"sodium":60,"fiber":0.3},{"name":"케밥(도네르)","aliases":["도네르 케밥","Döner Kebab"],"cuisine":"터키","servingDesc":"1인분(랩 1개, 약 300g)","servingGrams":300,"kcal":580,"carb":55,"protein":32,"fat":26,"satfat":8,"sugar":6,"sodium":980,"fiber":4},{"name":"샤와르마","aliases":["Shawarma"],"cuisine":"레반트","servingDesc":"1인분(랩 1개, 약 280g)","servingGrams":280,"kcal":520,"carb":48,"protein":28,"fat":24,"satfat":6,"sugar":4,"sodium":900,"fiber":3},{"name":"후무스","aliases":["Hummus"],"cuisine":"레반트","servingDesc":"1인분(약 100g, 피타 곁들임 제외)","servingGrams":100,"kcal":170,"carb":14,"protein":7,"fat":10,"satfat":1.4,"sugar":0.5,"sodium":330,"fiber":6},{"name":"팔라펠","aliases":["Falafel"],"cuisine":"레반트","servingDesc":"4개(약 100g)","servingGrams":100,"kcal":330,"carb":32,"protein":13,"fat":17,"satfat":2,"sugar":0.5,"sodium":450,"fiber":5.5},{"name":"타불레","aliases":["Tabbouleh"],"cuisine":"레반트","servingDesc":"1인분(약 120g)","servingGrams":120,"kcal":140,"carb":16,"protein":3,"fat":8,"satfat":1,"sugar":2,"sodium":250,"fiber":4},{"name":"바클라바","aliases":["Baklava"],"cuisine":"터키","servingDesc":"1조각(약 60g)","servingGrams":60,"kcal":280,"carb":30,"protein":4,"fat":17,"satfat":5,"sugar":20,"sodium":110,"fiber":1.5},{"name":"피타빵","aliases":["Pita Bread"],"cuisine":"레반트","servingDesc":"1장(약 70g)","servingGrams":70,"kcal":190,"carb":37,"protein":7,"fat":1.5,"satfat":0.3,"sugar":1,"sodium":370,"fiber":2},{"name":"돌마","aliases":["돌마데스","포도잎쌈","Dolma"],"cuisine":"터키","servingDesc":"6개(약 150g)","servingGrams":150,"kcal":220,"carb":30,"protein":4,"fat":10,"satfat":1.5,"sugar":3,"sodium":520,"fiber":3},{"name":"쿠스쿠스","aliases":["Couscous"],"cuisine":"북아프리카","servingDesc":"1인분(약 150g)","servingGrams":150,"kcal":210,"carb":40,"protein":6,"fat":2,"satfat":0.3,"sugar":1,"sodium":200,"fiber":3},{"name":"시시케밥","aliases":["Shish Kebab","쉬시케밥"],"cuisine":"터키","servingDesc":"1인분(꼬치 2개, 약 180g)","servingGrams":180,"kcal":320,"carb":4,"protein":36,"fat":18,"satfat":6,"sugar":1,"sodium":480,"fiber":0.5},{"name":"무사카","aliases":["Moussaka"],"cuisine":"그리스","servingDesc":"1인분(약 300g)","servingGrams":300,"kcal":420,"carb":22,"protein":18,"fat":28,"satfat":11,"sugar":8,"sodium":650,"fiber":4},{"name":"자지키","aliases":["Tzatziki"],"cuisine":"그리스","servingDesc":"1인분(약 80g)","servingGrams":80,"kcal":60,"carb":3,"protein":3,"fat":4,"satfat":2.5,"sugar":2,"sodium":180,"fiber":0.3},{"name":"그릭 샐러드","aliases":["Greek Salad","호리아티키"],"cuisine":"그리스","servingDesc":"1인분(약 250g)","servingGrams":250,"kcal":220,"carb":10,"protein":6,"fat":18,"satfat":6,"sugar":6,"sodium":620,"fiber":3},{"name":"수블라키","aliases":["Souvlaki"],"cuisine":"그리스","servingDesc":"1인분(꼬치 2개, 약 200g)","servingGrams":200,"kcal":340,"carb":3,"protein":34,"fat":22,"satfat":7,"sugar":1,"sodium":500,"fiber":0.3},{"name":"타진(치킨)","aliases":["Tagine","타진 치킨"],"cuisine":"모로코","servingDesc":"1인분(약 350g)","servingGrams":350,"kcal":420,"carb":20,"protein":32,"fat":22,"satfat":5,"sugar":8,"sodium":720,"fiber":4},{"name":"키베","aliases":["Kibbeh"],"cuisine":"레반트","servingDesc":"3개(약 150g)","servingGrams":150,"kcal":330,"carb":24,"protein":16,"fat":19,"satfat":5,"sugar":1,"sodium":420,"fiber":2},{"name":"바바가누쉬","aliases":["Baba Ghanoush"],"cuisine":"레반트","servingDesc":"1인분(약 100g)","servingGrams":100,"kcal":130,"carb":9,"protein":2,"fat":10,"satfat":1.5,"sugar":3,"sodium":300,"fiber":4},{"name":"만타(터키식 만두)","aliases":["Manti"],"cuisine":"터키","servingDesc":"1인분(약 250g)","servingGrams":250,"kcal":460,"carb":50,"protein":20,"fat":19,"satfat":8,"sugar":5,"sodium":700,"fiber":2.5},{"name":"라흐마준(터키식 피자)","aliases":["Lahmacun"],"cuisine":"터키","servingDesc":"1장(약 150g)","servingGrams":150,"kcal":300,"carb":38,"protein":14,"fat":10,"satfat":3,"sugar":3,"sodium":620,"fiber":2.5},{"name":"파스티치오(그리스식 파스타 바크)","aliases":["Pastitsio"],"cuisine":"그리스","servingDesc":"1인분(약 300g)","servingGrams":300,"kcal":480,"carb":38,"protein":22,"fat":26,"satfat":12,"sugar":6,"sodium":700,"fiber":2.5},{"name":"코프타","aliases":["Kofta","쾨프테"],"cuisine":"중동","servingDesc":"1인분(4개, 약 180g)","servingGrams":180,"kcal":340,"carb":6,"protein":26,"fat":24,"satfat":9,"sugar":2,"sodium":580,"fiber":1},{"name":"파투쉬","aliases":["Fattoush"],"cuisine":"레반트","servingDesc":"1인분(약 200g)","servingGrams":200,"kcal":180,"carb":16,"protein":3,"fat":12,"satfat":1.5,"sugar":4,"sodium":380,"fiber":4},{"name":"페타치즈 파이(스파나코피타)","aliases":["Spanakopita","시금치 파이"],"cuisine":"그리스","servingDesc":"1조각(약 120g)","servingGrams":120,"kcal":280,"carb":22,"protein":8,"fat":18,"satfat":8,"sugar":2,"sodium":480,"fiber":2.5},{"name":"메제 플래터","aliases":["Meze"],"cuisine":"중동","servingDesc":"1인분(모둠, 약 250g)","servingGrams":250,"kcal":380,"carb":30,"protein":10,"fat":24,"satfat":4,"sugar":5,"sodium":700,"fiber":6},{"name":"할루미 구이","aliases":["Grilled Halloumi","할루미치즈구이"],"cuisine":"키프로스","servingDesc":"1인분(약 100g)","servingGrams":100,"kcal":320,"carb":2,"protein":22,"fat":25,"satfat":16,"sugar":1,"sodium":900,"fiber":0},{"name":"맥앤치즈","aliases":["Mac and Cheese"],"cuisine":"미국","servingDesc":"1접시(약 200g)","servingGrams":200,"kcal":370,"carb":40,"protein":14,"fat":17,"satfat":9,"sugar":5,"sodium":720,"fiber":2},{"name":"버팔로윙","aliases":["Buffalo Wings"],"cuisine":"미국","servingDesc":"4조각(약 160g)","servingGrams":160,"kcal":430,"carb":4,"protein":26,"fat":34,"satfat":9,"sugar":1,"sodium":980,"fiber":0},{"name":"BBQ립","aliases":["Baby Back Ribs","바베큐 폭립"],"cuisine":"미국","servingDesc":"립 4대(약 250g)","servingGrams":250,"kcal":640,"carb":18,"protein":38,"fat":45,"satfat":16,"sugar":14,"sodium":900,"fiber":0},{"name":"클램차우더","aliases":["Clam Chowder"],"cuisine":"미국","servingDesc":"1컵(약 250g)","servingGrams":250,"kcal":220,"carb":18,"protein":10,"fat":12,"satfat":6,"sugar":4,"sodium":850,"fiber":1},{"name":"미트로프","aliases":["Meatloaf"],"cuisine":"미국","servingDesc":"1조각(약 150g)","servingGrams":150,"kcal":290,"carb":11,"protein":22,"fat":18,"satfat":7,"sugar":5,"sodium":620,"fiber":1},{"name":"베이글(크림치즈)","aliases":["Bagel with Cream Cheese"],"cuisine":"미국","servingDesc":"1개+크림치즈2큰술(약 150g)","servingGrams":150,"kcal":350,"carb":48,"protein":12,"fat":13,"satfat":7,"sugar":6,"sodium":520,"fiber":2},{"name":"팬케이크","aliases":["Pancakes"],"cuisine":"미국","servingDesc":"3장+시럽(약 220g)","servingGrams":220,"kcal":430,"carb":70,"protein":9,"fat":12,"satfat":3,"sugar":28,"sodium":650,"fiber":2},{"name":"콘브레드","aliases":["Cornbread"],"cuisine":"미국","servingDesc":"1조각(약 65g)","servingGrams":65,"kcal":190,"carb":29,"protein":4,"fat":7,"satfat":2,"sugar":9,"sodium":330,"fiber":1},{"name":"그릴드치즈샌드위치","aliases":["Grilled Cheese Sandwich"],"cuisine":"미국","servingDesc":"1개(약 120g)","servingGrams":120,"kcal":380,"carb":30,"protein":15,"fat":22,"satfat":11,"sugar":4,"sodium":760,"fiber":1},{"name":"시저샐러드","aliases":["Caesar Salad"],"cuisine":"미국","servingDesc":"1접시(약 180g)","servingGrams":180,"kcal":280,"carb":10,"protein":8,"fat":24,"satfat":5,"sugar":3,"sodium":600,"fiber":2},{"name":"코브샐러드","aliases":["Cobb Salad"],"cuisine":"미국","servingDesc":"1접시(약 300g)","servingGrams":300,"kcal":420,"carb":12,"protein":28,"fat":30,"satfat":9,"sugar":4,"sodium":850,"fiber":4},{"name":"프렌치토스트","aliases":["French Toast"],"cuisine":"미국","servingDesc":"2쪽(약 150g)","servingGrams":150,"kcal":350,"carb":42,"protein":11,"fat":15,"satfat":5,"sugar":18,"sodium":420,"fiber":2},{"name":"에그베네딕트","aliases":["Eggs Benedict"],"cuisine":"미국","servingDesc":"1인분(약 220g)","servingGrams":220,"kcal":460,"carb":24,"protein":18,"fat":33,"satfat":14,"sugar":2,"sodium":900,"fiber":1},{"name":"매쉬드포테이토","aliases":["Mashed Potatoes"],"cuisine":"미국","servingDesc":"1컵(약 200g)","servingGrams":200,"kcal":220,"carb":30,"protein":4,"fat":9,"satfat":5,"sugar":3,"sodium":450,"fiber":3},{"name":"감자그라탱","aliases":["Potato Gratin","그라탱"],"cuisine":"프랑스/미국","servingDesc":"1접시(약 200g)","servingGrams":200,"kcal":300,"carb":28,"protein":9,"fat":17,"satfat":10,"sugar":4,"sodium":480,"fiber":2},{"name":"치킨포트파이","aliases":["Chicken Pot Pie"],"cuisine":"미국","servingDesc":"1개(약 220g)","servingGrams":220,"kcal":540,"carb":42,"protein":18,"fat":32,"satfat":12,"sugar":4,"sodium":880,"fiber":3},{"name":"팟로스트","aliases":["Pot Roast"],"cuisine":"미국","servingDesc":"1인분(약 220g)","servingGrams":220,"kcal":380,"carb":12,"protein":32,"fat":22,"satfat":9,"sugar":3,"sodium":550,"fiber":2},{"name":"필스테이크샌드위치","aliases":["Philly Cheesesteak"],"cuisine":"미국","servingDesc":"1개(약 250g)","servingGrams":250,"kcal":600,"carb":45,"protein":32,"fat":32,"satfat":14,"sugar":5,"sodium":1050,"fiber":2},{"name":"루벤샌드위치","aliases":["Reuben Sandwich"],"cuisine":"미국","servingDesc":"1개(약 250g)","servingGrams":250,"kcal":560,"carb":36,"protein":28,"fat":33,"satfat":11,"sugar":6,"sodium":1400,"fiber":3},{"name":"치킨시저랩","aliases":["Chicken Caesar Wrap"],"cuisine":"미국","servingDesc":"1개(약 220g)","servingGrams":220,"kcal":480,"carb":38,"protein":26,"fat":24,"satfat":7,"sugar":3,"sodium":950,"fiber":2},{"name":"콘도그","aliases":["Corn Dog"],"cuisine":"미국","servingDesc":"1개(약 110g)","servingGrams":110,"kcal":300,"carb":26,"protein":9,"fat":18,"satfat":6,"sugar":6,"sodium":650,"fiber":1},{"name":"애플파이","aliases":["Apple Pie"],"cuisine":"미국","servingDesc":"1조각(약 125g)","servingGrams":125,"kcal":300,"carb":42,"protein":3,"fat":14,"satfat":5,"sugar":22,"sodium":230,"fiber":2},{"name":"치즈버거(홈메이드)","aliases":["Homemade Cheeseburger"],"cuisine":"미국","servingDesc":"1개(약 200g)","servingGrams":200,"kcal":540,"carb":32,"protein":28,"fat":33,"satfat":14,"sugar":6,"sodium":880,"fiber":2},{"name":"크루아상","aliases":["Croissant"],"cuisine":"프랑스","servingDesc":"1개(약 60g)","servingGrams":60,"kcal":270,"carb":31,"protein":5,"fat":14,"satfat":8,"sugar":6,"sodium":300,"fiber":1.5},{"name":"키슈","aliases":["Quiche Lorraine"],"cuisine":"프랑스","servingDesc":"1조각(약 150g)","servingGrams":150,"kcal":390,"carb":22,"protein":13,"fat":27,"satfat":13,"sugar":3,"sodium":560,"fiber":1.5},{"name":"라따뚜이","aliases":["Ratatouille"],"cuisine":"프랑스","servingDesc":"1접시(약 250g)","servingGrams":250,"kcal":150,"carb":16,"protein":3,"fat":9,"satfat":1.3,"sugar":10,"sodium":420,"fiber":5},{"name":"크레페","aliases":["Crepe"],"cuisine":"프랑스","servingDesc":"1장(설탕/잼, 약 120g)","servingGrams":120,"kcal":230,"carb":33,"protein":6,"fat":8,"satfat":3,"sugar":10,"sodium":180,"fiber":1},{"name":"에스카르고","aliases":["Escargot"],"cuisine":"프랑스","servingDesc":"6개(약 100g, 버터소스 포함)","servingGrams":100,"kcal":220,"carb":3,"protein":12,"fat":18,"satfat":10,"sugar":0.5,"sodium":450,"fiber":0.3},{"name":"프렌치 어니언 수프","aliases":["Onion Soup Gratinée"],"cuisine":"프랑스","servingDesc":"1그릇(약 300g)","servingGrams":300,"kcal":280,"carb":24,"protein":12,"fat":15,"satfat":8,"sugar":9,"sodium":980,"fiber":2.5},{"name":"코코뱅","aliases":["Coq au Vin"],"cuisine":"프랑스","servingDesc":"1인분(약 300g)","servingGrams":300,"kcal":420,"carb":10,"protein":35,"fat":25,"satfat":8,"sugar":3,"sodium":650,"fiber":1.5},{"name":"뵈프 부르기뇽","aliases":["Beef Bourguignon"],"cuisine":"프랑스","servingDesc":"1인분(약 320g)","servingGrams":320,"kcal":460,"carb":12,"protein":32,"fat":30,"satfat":11,"sugar":4,"sodium":680,"fiber":1.5},{"name":"파에야","aliases":["Paella"],"cuisine":"스페인","servingDesc":"1인분(약 350g)","servingGrams":350,"kcal":480,"carb":58,"protein":24,"fat":16,"satfat":3,"sugar":3,"sodium":720,"fiber":2},{"name":"감바스 알 아히요","aliases":["Gambas al Ajillo"],"cuisine":"스페인","servingDesc":"1접시(약 180g)","servingGrams":180,"kcal":300,"carb":3,"protein":20,"fat":24,"satfat":4,"sugar":0.5,"sodium":520,"fiber":0.3},{"name":"스페니시 토르티야","aliases":["Tortilla Española","감자 오믈렛"],"cuisine":"스페인","servingDesc":"1조각(약 150g)","servingGrams":150,"kcal":280,"carb":18,"protein":10,"fat":19,"satfat":4.5,"sugar":2,"sodium":320,"fiber":1.5},{"name":"가스파초","aliases":["Gazpacho"],"cuisine":"스페인","servingDesc":"1컵(약 250g)","servingGrams":250,"kcal":90,"carb":11,"protein":2,"fat":5,"satfat":0.7,"sugar":7,"sodium":380,"fiber":2},{"name":"하몽 플레이트","aliases":["Jamón Ibérico"],"cuisine":"스페인","servingDesc":"슬라이스 6장(약 60g)","servingGrams":60,"kcal":160,"carb":0.5,"protein":18,"fat":10,"satfat":3.5,"sugar":0,"sodium":900,"fiber":0},{"name":"굴라쉬","aliases":["Goulash"],"cuisine":"독일/헝가리","servingDesc":"1그릇(약 350g)","servingGrams":350,"kcal":390,"carb":20,"protein":28,"fat":21,"satfat":8,"sugar":6,"sodium":820,"fiber":2.5},{"name":"피시앤칩스","aliases":["Fish and Chips"],"cuisine":"영국","servingDesc":"1인분(약 350g)","servingGrams":350,"kcal":800,"carb":75,"protein":32,"fat":42,"satfat":6,"sugar":1,"sodium":900,"fiber":4},{"name":"슈니첼","aliases":["Wiener Schnitzel"],"cuisine":"독일/오스트리아","servingDesc":"1장(약 180g)","servingGrams":180,"kcal":450,"carb":22,"protein":30,"fat":26,"satfat":5,"sugar":1,"sodium":520,"fiber":1},{"name":"프레첼","aliases":["Pretzel","브레첼"],"cuisine":"독일","servingDesc":"1개(약 100g)","servingGrams":100,"kcal":340,"carb":72,"protein":9,"fat":2.5,"satfat":0.5,"sugar":2,"sodium":840,"fiber":2.5},{"name":"브라트부르스트","aliases":["Bratwurst"],"cuisine":"독일","servingDesc":"1개(약 100g, 빵 제외)","servingGrams":100,"kcal":300,"carb":2,"protein":13,"fat":27,"satfat":10,"sugar":1,"sodium":700,"fiber":0},{"name":"자우어브라텐","aliases":["Sauerbraten"],"cuisine":"독일","servingDesc":"1인분(약 250g)","servingGrams":250,"kcal":380,"carb":15,"protein":32,"fat":20,"satfat":7,"sugar":8,"sodium":650,"fiber":1},{"name":"잉글리시 브렉퍼스트","aliases":["Full English Breakfast"],"cuisine":"영국","servingDesc":"1접시(약 400g)","servingGrams":400,"kcal":750,"carb":35,"protein":32,"fat":52,"satfat":16,"sugar":5,"sodium":1300,"fiber":4},{"name":"셰퍼드 파이","aliases":["Shepherd\u0027s Pie"],"cuisine":"영국","servingDesc":"1인분(약 300g)","servingGrams":300,"kcal":420,"carb":35,"protein":22,"fat":22,"satfat":10,"sugar":6,"sodium":650,"fiber":3.5},{"name":"비프 웰링턴","aliases":["Beef Wellington"],"cuisine":"영국","servingDesc":"1조각(약 220g)","servingGrams":220,"kcal":560,"carb":28,"protein":32,"fat":35,"satfat":16,"sugar":2,"sodium":580,"fiber":1.5},{"name":"카프레제 샐러드","aliases":["Caprese Salad"],"cuisine":"이탈리아","servingDesc":"1접시(약 200g)","servingGrams":200,"kcal":250,"carb":6,"protein":13,"fat":19,"satfat":9,"sugar":4,"sodium":380,"fiber":1.5},{"name":"리소토","aliases":["Risotto"],"cuisine":"이탈리아","servingDesc":"1인분(약 280g)","servingGrams":280,"kcal":420,"carb":58,"protein":10,"fat":15,"satfat":8,"sugar":2,"sodium":650,"fiber":2},{"name":"엠파나다 (아르헨티나식, 소고기)","aliases":["Empanada","엠빠나다"],"cuisine":"아르헨티나","servingDesc":"2개(약 140g)","servingGrams":140,"kcal":330,"carb":28,"protein":11,"fat":19,"satfat":6,"sugar":2,"sodium":420,"fiber":2},{"name":"페이조아다","aliases":["Feijoada"],"cuisine":"브라질","servingDesc":"1접시(밥 포함, 약 400g)","servingGrams":400,"kcal":620,"carb":55,"protein":35,"fat":28,"satfat":10,"sugar":3,"sodium":900,"fiber":9},{"name":"슈하스코 (구운 소고기)","aliases":["Churrasco","피카냐 구이"],"cuisine":"브라질","servingDesc":"1인분(약 200g)","servingGrams":200,"kcal":440,"carb":0,"protein":42,"fat":30,"satfat":12,"sugar":0,"sodium":480,"fiber":0},{"name":"아레파","aliases":["Arepa"],"cuisine":"베네수엘라/콜롬비아","servingDesc":"1개(약 120g)","servingGrams":120,"kcal":250,"carb":45,"protein":5,"fat":6,"satfat":1,"sugar":1,"sodium":300,"fiber":3},{"name":"파보 아사도 (구운 칠면조)","aliases":["Pavo Asado"],"cuisine":"칠레","servingDesc":"1인분(약 180g)","servingGrams":180,"kcal":300,"carb":2,"protein":40,"fat":14,"satfat":4,"sugar":1,"sodium":460,"fiber":0},{"name":"살텐냐","aliases":["Salteña"],"cuisine":"볼리비아","servingDesc":"1개(약 150g)","servingGrams":150,"kcal":320,"carb":35,"protein":12,"fat":15,"satfat":5,"sugar":4,"sodium":480,"fiber":2},{"name":"프리홀레스 (콩 스튜)","aliases":["Frijoles","프리홀레스 네그로스"],"cuisine":"중남미 전역","servingDesc":"1공기(약 200g)","servingGrams":200,"kcal":230,"carb":38,"protein":13,"fat":3,"satfat":1,"sugar":2,"sodium":420,"fiber":13},{"name":"엠파나다 데 케소","aliases":["치즈 엠파나다"],"cuisine":"콜롬비아","servingDesc":"2개(약 130g)","servingGrams":130,"kcal":340,"carb":30,"protein":9,"fat":20,"satfat":8,"sugar":2,"sodium":460,"fiber":1},{"name":"로모 살타도","aliases":["Lomo Saltado"],"cuisine":"페루","servingDesc":"1접시(밥 포함, 약 380g)","servingGrams":380,"kcal":560,"carb":55,"protein":30,"fat":24,"satfat":7,"sugar":4,"sodium":780,"fiber":4},{"name":"아히 데 가이나","aliases":["Aji de Gallina"],"cuisine":"페루","servingDesc":"1접시(밥 포함, 약 350g)","servingGrams":350,"kcal":520,"carb":45,"protein":28,"fat":25,"satfat":8,"sugar":3,"sodium":700,"fiber":3},{"name":"파차망카 (안데스 화덕 구이)","aliases":["Pachamanca","팟차망카"],"cuisine":"페루","servingDesc":"1인분(약 300g)","servingGrams":300,"kcal":480,"carb":30,"protein":35,"fat":24,"satfat":8,"sugar":2,"sodium":550,"fiber":4},{"name":"반데하 파이사 (일부)","aliases":["Bandeja Paisa","콩+쌀+고기 접시"],"cuisine":"콜롬비아","servingDesc":"1접시(약 450g)","servingGrams":450,"kcal":850,"carb":70,"protein":40,"fat":45,"satfat":15,"sugar":3,"sodium":1100,"fiber":10},{"name":"아히아코","aliases":["Ajiaco","아산코"],"cuisine":"콜롬비아","servingDesc":"1그릇(약 350g)","servingGrams":350,"kcal":300,"carb":35,"protein":18,"fat":10,"satfat":3,"sugar":3,"sodium":650,"fiber":5},{"name":"모롱가/부딘","aliases":["Morcilla"],"cuisine":"아르헨티나","servingDesc":"1인분(약 100g)","servingGrams":100,"kcal":280,"carb":6,"protein":14,"fat":22,"satfat":8,"sugar":1,"sodium":600,"fiber":0},{"name":"밀라네사","aliases":["Milanesa"],"cuisine":"아르헨티나","servingDesc":"1장(약 150g)","servingGrams":150,"kcal":380,"carb":20,"protein":28,"fat":20,"satfat":5,"sugar":1,"sodium":520,"fiber":1},{"name":"파스텔 (튀김만두)","aliases":["Pastel","브라질식 튀김만두"],"cuisine":"브라질","servingDesc":"1개(약 90g)","servingGrams":90,"kcal":260,"carb":22,"protein":8,"fat":16,"satfat":4,"sugar":1,"sodium":320,"fiber":1},{"name":"파오 지 케이주","aliases":["Pao de Queijo","치즈빵볼"],"cuisine":"브라질","servingDesc":"3개(약 90g)","servingGrams":90,"kcal":260,"carb":26,"protein":6,"fat":15,"satfat":6,"sugar":1,"sodium":340,"fiber":0},{"name":"모케카","aliases":["Moqueca"],"cuisine":"브라질","servingDesc":"1접시(약 350g)","servingGrams":350,"kcal":400,"carb":18,"protein":28,"fat":24,"satfat":10,"sugar":4,"sodium":650,"fiber":3},{"name":"초리판 (초리소 샌드위치)","aliases":["Choripan","초리판"],"cuisine":"아르헨티나","servingDesc":"1개(약 180g)","servingGrams":180,"kcal":480,"carb":35,"protein":18,"fat":30,"satfat":11,"sugar":3,"sodium":900,"fiber":2},{"name":"우미타","aliases":["Humita"],"cuisine":"칠레/에콰도르","servingDesc":"1개(약 130g)","servingGrams":130,"kcal":180,"carb":28,"protein":5,"fat":6,"satfat":2,"sugar":6,"sodium":250,"fiber":3},{"name":"카수엘라","aliases":["Cazuela"],"cuisine":"칠레","servingDesc":"1그릇(약 350g)","servingGrams":350,"kcal":280,"carb":25,"protein":22,"fat":10,"satfat":3,"sugar":4,"sodium":600,"fiber":4},{"name":"로크로 (감자치즈수프)","aliases":["Locro","로크로 데 파파"],"cuisine":"에콰도르","servingDesc":"1그릇(약 300g)","servingGrams":300,"kcal":330,"carb":40,"protein":10,"fat":14,"satfat":6,"sugar":3,"sodium":620,"fiber":6},{"name":"엔코카도 (생선 코코넛스튜)","aliases":["Encocado de Pescado","엔코카도"],"cuisine":"에콰도르","servingDesc":"1접시(약 300g)","servingGrams":300,"kcal":380,"carb":15,"protein":25,"fat":25,"satfat":15,"sugar":5,"sodium":580,"fiber":2},{"name":"파스텔 데 초클로","aliases":["Pastel de Choclo"],"cuisine":"칠레","servingDesc":"1인분(약 300g)","servingGrams":300,"kcal":420,"carb":40,"protein":20,"fat":20,"satfat":7,"sugar":10,"sodium":550,"fiber":3},{"name":"과사카카 곁들인 그릴 소고기","aliases":["Guasacaca"],"cuisine":"베네수엘라","servingDesc":"1인분(약 250g)","servingGrams":250,"kcal":400,"carb":6,"protein":35,"fat":26,"satfat":8,"sugar":2,"sodium":500,"fiber":2},{"name":"마카롱","aliases":["Macaron"],"cuisine":"프랑스","servingDesc":"2개(약 40g)","servingGrams":40,"kcal":160,"carb":22,"protein":2.5,"fat":7,"satfat":2,"sugar":19,"sodium":30,"fiber":0.5},{"name":"와플","aliases":["Waffle","벨기에와플"],"cuisine":"벨기에","servingDesc":"1개(약 120g)","servingGrams":120,"kcal":330,"carb":40,"protein":7,"fat":15,"satfat":6,"sugar":10,"sodium":450,"fiber":1.5},{"name":"도넛","aliases":["Donut","글레이즈드도넛"],"cuisine":"미국","servingDesc":"1개(약 60g)","servingGrams":60,"kcal":250,"carb":30,"protein":3,"fat":13,"satfat":6,"sugar":13,"sodium":200,"fiber":0.8},{"name":"브라우니","aliases":["Brownie"],"cuisine":"미국","servingDesc":"1조각(약 60g)","servingGrams":60,"kcal":260,"carb":33,"protein":3,"fat":13,"satfat":6,"sugar":25,"sodium":150,"fiber":1.5},{"name":"치즈케이크","aliases":["Cheesecake","뉴욕치즈케이크"],"cuisine":"미국","servingDesc":"1조각(약 100g)","servingGrams":100,"kcal":320,"carb":26,"protein":6,"fat":22,"satfat":13,"sugar":21,"sodium":260,"fiber":0.5},{"name":"버블티","aliases":["Bubble Tea","밀크티 펄"],"cuisine":"대만","servingDesc":"1잔(약 500ml)","servingGrams":500,"kcal":300,"carb":65,"protein":3,"fat":4,"satfat":3,"sugar":50,"sodium":90,"fiber":0.5},{"name":"젤라또","aliases":["Gelato"],"cuisine":"이탈리아","servingDesc":"1스쿱(약 90g)","servingGrams":90,"kcal":150,"carb":20,"protein":3,"fat":6,"satfat":4,"sugar":18,"sodium":40,"fiber":0},{"name":"판나코타","aliases":["Panna Cotta"],"cuisine":"이탈리아","servingDesc":"1컵(약 120g)","servingGrams":120,"kcal":250,"carb":18,"protein":4,"fat":18,"satfat":11,"sugar":16,"sodium":45,"fiber":0},{"name":"크렘브륄레","aliases":["Creme Brulee"],"cuisine":"프랑스","servingDesc":"1개(약 100g)","servingGrams":100,"kcal":300,"carb":22,"protein":5,"fat":21,"satfat":12,"sugar":20,"sodium":60,"fiber":0},{"name":"밀크셰이크","aliases":["Milkshake"],"cuisine":"미국","servingDesc":"1잔(약 350ml)","servingGrams":350,"kcal":350,"carb":52,"protein":8,"fat":13,"satfat":8,"sugar":45,"sodium":180,"fiber":0.5},{"name":"스무디볼","aliases":["Smoothie Bowl","아사이볼"],"cuisine":"미국","servingDesc":"1볼(약 350g)","servingGrams":350,"kcal":320,"carb":58,"protein":7,"fat":8,"satfat":2,"sugar":38,"sodium":40,"fiber":7},{"name":"에그타르트","aliases":["Egg Tart","포르투갈타르트"],"cuisine":"포르투갈","servingDesc":"1개(약 60g)","servingGrams":60,"kcal":210,"carb":18,"protein":4,"fat":14,"satfat":7,"sugar":10,"sodium":110,"fiber":0.3},{"name":"바스크치즈케이크","aliases":["Basque Cheesecake"],"cuisine":"스페인","servingDesc":"1조각(약 100g)","servingGrams":100,"kcal":330,"carb":22,"protein":7,"fat":25,"satfat":14,"sugar":18,"sodium":280,"fiber":0.3},{"name":"츄러스","aliases":["Churros"],"cuisine":"스페인","servingDesc":"3개(약 90g)","servingGrams":90,"kcal":300,"carb":38,"protein":4,"fat":15,"satfat":5,"sugar":16,"sodium":220,"fiber":1},{"name":"바나나브레드","aliases":["Banana Bread"],"cuisine":"미국","servingDesc":"1조각(약 90g)","servingGrams":90,"kcal":270,"carb":40,"protein":4,"fat":11,"satfat":4,"sugar":22,"sodium":230,"fiber":1.5},{"name":"쿠키","aliases":["Cookie","초코칩쿠키"],"cuisine":"미국","servingDesc":"2개(약 50g)","servingGrams":50,"kcal":240,"carb":32,"protein":3,"fat":11,"satfat":6,"sugar":18,"sodium":170,"fiber":1},{"name":"콜드브루","aliases":["Cold Brew"],"cuisine":"미국","servingDesc":"1잔(약 350ml)","servingGrams":350,"kcal":15,"carb":3,"protein":1,"fat":0,"satfat":0,"sugar":0,"sodium":10,"fiber":0},{"name":"핫초코","aliases":["Hot Chocolate","코코아"],"cuisine":"유럽","servingDesc":"1잔(약 300ml)","servingGrams":300,"kcal":280,"carb":35,"protein":9,"fat":11,"satfat":7,"sugar":30,"sodium":180,"fiber":2},{"name":"플랑","aliases":["Flan","카라멜커스터드"],"cuisine":"스페인","servingDesc":"1개(약 100g)","servingGrams":100,"kcal":220,"carb":30,"protein":6,"fat":8,"satfat":4,"sugar":28,"sodium":80,"fiber":0},{"name":"맥주(라거)","aliases":["필스너","카스","하이트"],"cuisine":"맥주","servingDesc":"1캔(500ml)","servingGrams":500,"kcal":210,"carb":13,"protein":2,"fat":0,"satfat":0,"sugar":0.5,"sodium":10,"fiber":0},{"name":"흑맥주","aliases":["스타우트","기네스"],"cuisine":"맥주","servingDesc":"1잔(500ml)","servingGrams":500,"kcal":240,"carb":18,"protein":2.5,"fat":0,"satfat":0,"sugar":1,"sodium":15,"fiber":0.5},{"name":"크래프트맥주(IPA)","aliases":["IPA"],"cuisine":"맥주","servingDesc":"1잔(355ml)","servingGrams":355,"kcal":220,"carb":18,"protein":2,"fat":0,"satfat":0,"sugar":1,"sodium":10,"fiber":0},{"name":"소주","aliases":["참이슬","처음처럼"],"cuisine":"증류주","servingDesc":"1병(360ml)","servingGrams":360,"kcal":390,"carb":12,"protein":0,"fat":0,"satfat":0,"sugar":10,"sodium":0,"fiber":0},{"name":"막걸리","aliases":["탁주","동동주"],"cuisine":"탁주","servingDesc":"1병(750ml)","servingGrams":750,"kcal":390,"carb":45,"protein":3,"fat":0,"satfat":0,"sugar":15,"sodium":20,"fiber":0},{"name":"청주(정종)","aliases":["약주"],"cuisine":"청주","servingDesc":"1잔(150ml)","servingGrams":150,"kcal":160,"carb":6,"protein":0.3,"fat":0,"satfat":0,"sugar":3,"sodium":5,"fiber":0},{"name":"사케","aliases":["니혼슈"],"cuisine":"청주","servingDesc":"1잔(180ml)","servingGrams":180,"kcal":195,"carb":6,"protein":0.4,"fat":0,"satfat":0,"sugar":2,"sodium":3,"fiber":0},{"name":"레드와인","aliases":["까베르네","메를로"],"cuisine":"와인","servingDesc":"1잔(150ml)","servingGrams":150,"kcal":125,"carb":4,"protein":0.1,"fat":0,"satfat":0,"sugar":1,"sodium":6,"fiber":0},{"name":"화이트와인","aliases":["샤르도네"],"cuisine":"와인","servingDesc":"1잔(150ml)","servingGrams":150,"kcal":121,"carb":3.8,"protein":0.1,"fat":0,"satfat":0,"sugar":1.5,"sodium":6,"fiber":0},{"name":"스파클링와인(샴페인)","aliases":["샴페인","프로세코"],"cuisine":"와인","servingDesc":"1잔(120ml)","servingGrams":120,"kcal":96,"carb":2.5,"protein":0.1,"fat":0,"satfat":0,"sugar":1.5,"sodium":6,"fiber":0},{"name":"위스키(스트레이트)","aliases":["온더락"],"cuisine":"증류주","servingDesc":"1샷(45ml)","servingGrams":45,"kcal":105,"carb":0,"protein":0,"fat":0,"satfat":0,"sugar":0,"sodium":0,"fiber":0},{"name":"하이볼","aliases":["위스키소다"],"cuisine":"칵테일","servingDesc":"1잔(300ml)","servingGrams":300,"kcal":110,"carb":1,"protein":0,"fat":0,"satfat":0,"sugar":0,"sodium":5,"fiber":0},{"name":"보드카","aliases":["스미노프"],"cuisine":"증류주","servingDesc":"1샷(45ml)","servingGrams":45,"kcal":97,"carb":0,"protein":0,"fat":0,"satfat":0,"sugar":0,"sodium":0,"fiber":0},{"name":"럼","aliases":["바카디"],"cuisine":"증류주","servingDesc":"1샷(45ml)","servingGrams":45,"kcal":97,"carb":0,"protein":0,"fat":0,"satfat":0,"sugar":0,"sodium":0,"fiber":0},{"name":"진","aliases":["고든스","봄베이"],"cuisine":"증류주","servingDesc":"1샷(45ml)","servingGrams":45,"kcal":97,"carb":0,"protein":0,"fat":0,"satfat":0,"sugar":0,"sodium":0,"fiber":0},{"name":"데킬라","aliases":["테킬라"],"cuisine":"증류주","servingDesc":"1샷(45ml)","servingGrams":45,"kcal":97,"carb":0,"protein":0,"fat":0,"satfat":0,"sugar":0,"sodium":0,"fiber":0},{"name":"매실주","aliases":["매화수"],"cuisine":"과실주","servingDesc":"1잔(100ml)","servingGrams":100,"kcal":145,"carb":16,"protein":0.1,"fat":0,"satfat":0,"sugar":15,"sodium":3,"fiber":0},{"name":"복분자주","aliases":["복분자"],"cuisine":"과실주","servingDesc":"1잔(100ml)","servingGrams":100,"kcal":130,"carb":14,"protein":0.1,"fat":0,"satfat":0,"sugar":13,"sodium":3,"fiber":0.2},{"name":"하드사이더(사과발효주)","aliases":["사이다주","애플사이더"],"cuisine":"과실주","servingDesc":"1병(330ml)","servingGrams":330,"kcal":180,"carb":20,"protein":0,"fat":0,"satfat":0,"sugar":18,"sodium":10,"fiber":0},{"name":"모히토","aliases":[],"cuisine":"칵테일","servingDesc":"1잔(250ml)","servingGrams":250,"kcal":160,"carb":13,"protein":0,"fat":0,"satfat":0,"sugar":11,"sodium":5,"fiber":0.3},{"name":"마가리타","aliases":[],"cuisine":"칵테일","servingDesc":"1잔(200ml)","servingGrams":200,"kcal":220,"carb":12,"protein":0.2,"fat":0,"satfat":0,"sugar":10,"sodium":100,"fiber":0.2},{"name":"스크류드라이버","aliases":["보드카오렌지"],"cuisine":"칵테일","servingDesc":"1잔(240ml)","servingGrams":240,"kcal":180,"carb":18,"protein":0.5,"fat":0,"satfat":0,"sugar":16,"sodium":3,"fiber":0.2},{"name":"피나콜라다","aliases":[],"cuisine":"칵테일","servingDesc":"1잔(240ml)","servingGrams":240,"kcal":300,"carb":32,"protein":1,"fat":6,"satfat":5,"sugar":28,"sodium":15,"fiber":1},{"name":"한우등심구이","aliases":["Hanwoo Sirloin"],"cuisine":"한국","servingDesc":"1인분(약 150g)","servingGrams":150,"kcal":390,"carb":1,"protein":26,"fat":31,"satfat":13,"sugar":0,"sodium":260,"fiber":0},{"name":"안심스테이크","aliases":["Beef Tenderloin Steak","Filet Mignon"],"cuisine":"미국","servingDesc":"1인분(약 200g)","servingGrams":200,"kcal":420,"carb":0,"protein":42,"fat":27,"satfat":11,"sugar":0,"sodium":320,"fiber":0},{"name":"채끝등심스테이크","aliases":["Striploin Steak","New York Strip"],"cuisine":"미국","servingDesc":"1인분(약 220g)","servingGrams":220,"kcal":520,"carb":0,"protein":46,"fat":36,"satfat":15,"sugar":0,"sodium":340,"fiber":0},{"name":"항정살구이","aliases":["Pork Jowl","Hangjeongsal"],"cuisine":"한국","servingDesc":"1인분(약 150g)","servingGrams":150,"kcal":430,"carb":1,"protein":24,"fat":37,"satfat":13,"sugar":0,"sodium":280,"fiber":0},{"name":"가브리살구이","aliases":["Pork Skirt Meat"],"cuisine":"한국","servingDesc":"1인분(약 150g)","servingGrams":150,"kcal":400,"carb":1,"protein":25,"fat":33,"satfat":12,"sugar":0,"sodium":270,"fiber":0},{"name":"우삼겹구이","aliases":["Beef Belly"],"cuisine":"한국","servingDesc":"1인분(약 150g)","servingGrams":150,"kcal":470,"carb":1,"protein":21,"fat":42,"satfat":18,"sugar":0,"sodium":290,"fiber":0},{"name":"차돌박이구이","aliases":["Beef Brisket Point"],"cuisine":"한국","servingDesc":"1인분(약 150g)","servingGrams":150,"kcal":460,"carb":1,"protein":22,"fat":41,"satfat":18,"sugar":0,"sodium":300,"fiber":0},{"name":"소곱창구이","aliases":["Grilled Beef Intestine","Gopchang"],"cuisine":"한국","servingDesc":"1인분(약 200g)","servingGrams":200,"kcal":480,"carb":3,"protein":26,"fat":40,"satfat":16,"sugar":0,"sodium":460,"fiber":0},{"name":"막창구이","aliases":["Grilled Beef Abomasum"],"cuisine":"한국","servingDesc":"1인분(약 200g)","servingGrams":200,"kcal":500,"carb":3,"protein":25,"fat":43,"satfat":17,"sugar":0,"sodium":470,"fiber":0},{"name":"대창구이","aliases":["Grilled Beef Large Intestine"],"cuisine":"한국","servingDesc":"1인분(약 150g)","servingGrams":150,"kcal":540,"carb":2,"protein":18,"fat":51,"satfat":21,"sugar":0,"sodium":420,"fiber":0},{"name":"육회","aliases":["Yukhoe","Korean Beef Tartare"],"cuisine":"한국","servingDesc":"1인분(약 150g)","servingGrams":150,"kcal":260,"carb":8,"protein":25,"fat":13,"satfat":4,"sugar":5,"sodium":480,"fiber":1},{"name":"편육","aliases":["Pyeonyuk","Boiled Sliced Pork"],"cuisine":"한국","servingDesc":"1인분(약 150g)","servingGrams":150,"kcal":320,"carb":1,"protein":30,"fat":21,"satfat":8,"sugar":0,"sodium":380,"fiber":0},{"name":"수육","aliases":["Suyuk","Boiled Pork Belly"],"cuisine":"한국","servingDesc":"1인분(약 200g)","servingGrams":200,"kcal":480,"carb":1,"protein":32,"fat":38,"satfat":14,"sugar":0,"sodium":400,"fiber":0},{"name":"보쌈","aliases":["Bossam"],"cuisine":"한국","servingDesc":"1인분(약 250g, 김치 포함)","servingGrams":250,"kcal":550,"carb":10,"protein":36,"fat":40,"satfat":15,"sugar":4,"sodium":780,"fiber":2},{"name":"양갈비구이","aliases":["Lamb Chops"],"cuisine":"미국","servingDesc":"1인분(약 200g)","servingGrams":200,"kcal":480,"carb":0,"protein":34,"fat":37,"satfat":16,"sugar":0,"sodium":350,"fiber":0},{"name":"훈제오리","aliases":["Smoked Duck"],"cuisine":"한국","servingDesc":"1인분(약 150g)","servingGrams":150,"kcal":410,"carb":2,"protein":24,"fat":33,"satfat":10,"sugar":1,"sodium":560,"fiber":0},{"name":"닭다리구이","aliases":["Grilled Chicken Leg"],"cuisine":"한국","servingDesc":"1인분(약 200g)","servingGrams":200,"kcal":380,"carb":3,"protein":38,"fat":23,"satfat":7,"sugar":1,"sodium":420,"fiber":0},{"name":"닭날개구이","aliases":["Grilled Chicken Wings"],"cuisine":"한국","servingDesc":"1인분(약 180g, 4개)","servingGrams":180,"kcal":420,"carb":4,"protein":32,"fat":29,"satfat":8,"sugar":2,"sodium":480,"fiber":0},{"name":"닭똥집볶음","aliases":["Stir-fried Chicken Gizzard"],"cuisine":"한국","servingDesc":"1인분(약 200g)","servingGrams":200,"kcal":320,"carb":10,"protein":34,"fat":14,"satfat":3,"sugar":5,"sodium":620,"fiber":1},{"name":"안창살구이","aliases":["Beef Skirt/Hanger Steak"],"cuisine":"한국","servingDesc":"1인분(약 150g)","servingGrams":150,"kcal":400,"carb":1,"protein":26,"fat":32,"satfat":13,"sugar":0,"sodium":270,"fiber":0},{"name":"토마호크스테이크","aliases":["Tomahawk Steak"],"cuisine":"미국","servingDesc":"1인분(약 350g, 뼈 제외 실중량)","servingGrams":350,"kcal":900,"carb":0,"protein":68,"fat":68,"satfat":28,"sugar":0,"sodium":480,"fiber":0},{"name":"폭립","aliases":["Pork Ribs","BBQ Ribs"],"cuisine":"미국","servingDesc":"1인분(약 300g, 뼈 포함)","servingGrams":300,"kcal":650,"carb":18,"protein":38,"fat":45,"satfat":16,"sugar":14,"sodium":720,"fiber":1},{"name":"돼지갈비구이","aliases":["Grilled Pork Ribs Korean Style","Dwaeji Galbi"],"cuisine":"한국","servingDesc":"1인분(약 200g)","servingGrams":200,"kcal":480,"carb":14,"protein":30,"fat":32,"satfat":11,"sugar":9,"sodium":650,"fiber":0},{"name":"양념갈비","aliases":["Marinated Beef Short Rib","Yangnyeom Galbi"],"cuisine":"한국","servingDesc":"1인분(약 200g)","servingGrams":200,"kcal":520,"carb":18,"protein":28,"fat":36,"satfat":14,"sugar":13,"sodium":700,"fiber":0},{"name":"닭꼬치구이","aliases":["Dak Kkochi","Chicken Skewers"],"cuisine":"한국","servingDesc":"1인분(약 150g, 2꼬치)","servingGrams":150,"kcal":300,"carb":10,"protein":26,"fat":16,"satfat":4,"sugar":7,"sodium":480,"fiber":0}];
+
+  var FOOD_SEARCH_INDEX = FOOD_DB.map(function (f) {
+    var terms = [f.name].concat(f.aliases || []).map(function (s) { return s.toLowerCase(); });
+    return { food: f, terms: terms };
+  });
+
+  function searchFood(query) {
+    var q = String(query || '').trim().toLowerCase();
+    if (!q) return [];
+    var matches = [];
+    for (var i = 0; i < FOOD_SEARCH_INDEX.length; i++) {
+      var entry = FOOD_SEARCH_INDEX[i];
+      for (var j = 0; j < entry.terms.length; j++) {
+        if (entry.terms[j].indexOf(q) !== -1) { matches.push(entry.food); break; }
+      }
+      if (matches.length >= 8) break;
+    }
+    return matches;
+  }
+
+  var FOOD_FIELD_IDS = { kcal: 'f-kcal', carb: 'f-carb', protein: 'f-protein', fat: 'f-fat', satfat: 'f-satfat', sugar: 'f-sugar', sodium: 'f-sodium', fiber: 'f-fiber' };
+  function roundForField(key, v) { return (key === 'kcal' || key === 'sodium') ? Math.round(v) : round1(v); }
+  function fillNutrientsFromFood(food, qty) {
+    Object.keys(FOOD_FIELD_IDS).forEach(function (key) {
+      var el = document.getElementById(FOOD_FIELD_IDS[key]);
+      if (el) el.value = roundForField(key, (food[key] || 0) * qty);
+    });
+  }
+
+  function groupKey(gender, ageBand) { return gender + "-" + ageBand; }
+  function groupLabel(gender, ageBand) {
+    return (ageBand === "1929" ? "20대" : "30대") + " " + (gender === "M" ? "남성" : "여성");
+  }
+
+  // ---------------------------------------------------------------
+  // Judgement + gauge model
+  // ---------------------------------------------------------------
+  function judge(kind, target, consumed) {
+    if (kind === "band") {
+      var low = target * 0.9, high = target * 1.1;
+      if (consumed < low) return "warn";
+      if (consumed > high) return "bad";
+      return "ok";
+    }
+    if (kind === "range") {
+      if (consumed < target[0]) return "warn";
+      if (consumed > target[1]) return "bad";
+      return "ok";
+    }
+    if (kind === "maxOnly") return consumed > target ? "bad" : "ok";
+    if (kind === "minOnly") return consumed < target ? "warn" : "ok";
+    return "ok";
+  }
+
+  function statusLabel(kind, tone) {
+    if (kind === "maxOnly") return tone === "bad" ? "초과" : "정상";
+    if (kind === "minOnly") return tone === "warn" ? "부족" : "정상";
+    return tone === "ok" ? "적정" : (tone === "warn" ? "부족" : "초과");
+  }
+
+  function targetText(nut, target) {
+    if (nut.kind === "range") return target[0] + "~" + target[1] + " " + nut.unit;
+    if (nut.kind === "maxOnly") return target + " " + nut.unit + " 이하";
+    if (nut.kind === "minOnly") return target + " " + nut.unit + " 이상";
+    return target + " " + nut.unit;
+  }
+
+  function gaugeModel(kind, target, consumed) {
+    var zoneMin, zoneMax;
+    if (kind === "band") { zoneMin = target * 0.9; zoneMax = target * 1.1; }
+    else if (kind === "range") { zoneMin = target[0]; zoneMax = target[1]; }
+    else if (kind === "maxOnly") { zoneMin = 0; zoneMax = target; }
+    else { zoneMin = target; zoneMax = target; } // minOnly: zone opens to the right edge
+
+    var scaleMax = Math.max(zoneMax * 1.25, consumed * 1.1, 1);
+    if (kind === "minOnly") scaleMax = Math.max(target * 1.6, consumed * 1.1, 1);
+    var pct = function (v) { return Math.max(0, Math.min(100, (v / scaleMax) * 100)); };
+    var zoneEndPct = kind === "minOnly" ? 100 : pct(zoneMax);
+    return { zoneStartPct: pct(zoneMin), zoneEndPct: zoneEndPct, fillPct: pct(consumed) };
+  }
+
+  // ---------------------------------------------------------------
+  // Small utils
+  // ---------------------------------------------------------------
+  function uid(prefix) {
+    return (prefix || "id") + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+  }
+  function todayStr() {
+    var d = new Date();
+    var m = String(d.getMonth() + 1).padStart(2, "0");
+    var day = String(d.getDate()).padStart(2, "0");
+    return d.getFullYear() + "-" + m + "-" + day;
+  }
+  function fmtDate(s) {
+    var p = s.split("-");
+    return p[0] + "년 " + parseInt(p[1], 10) + "월 " + parseInt(p[2], 10) + "일";
+  }
+  function num(v) { var n = Number(v); return isFinite(n) && n >= 0 ? n : 0; }
+  function sumItems(items, key) {
+    return items.reduce(function (acc, it) { return acc + num(it[key]); }, 0);
+  }
+  function round1(v) { return Math.round(v * 10) / 10; }
+
+  // ---------------------------------------------------------------
+  // Store: shared `db` capability when available, else per-browser
+  // localStorage fallback so the page still works stand-alone.
+  // ---------------------------------------------------------------
+  var LOCAL_KEY = "kkinipyo_local_store_v1";
+  function loadLocal() {
+    try {
+      var raw = localStorage.getItem(LOCAL_KEY);
+      return raw ? JSON.parse(raw) : { profiles: {}, entries: {} };
+    } catch (e) { return { profiles: {}, entries: {} }; }
+  }
+  function saveLocal(data) {
+    try { localStorage.setItem(LOCAL_KEY, JSON.stringify(data)); } catch (e) {}
+  }
+
+  var Store = {
+    mode: "connecting", // 'shared' | 'local'
+    db: null,
+
+    init: function () {
+      var self = this;
+      if (!(window.claude && window.claude.use)) {
+        self.mode = "local";
+        return Promise.resolve();
+      }
+      return window.claude.use("db").then(function (db) {
+        if (db) { self.db = db; self.mode = "shared"; }
+        else { self.mode = "local"; }
+      }).catch(function () { self.mode = "local"; });
+    },
+
+    listProfiles: function (onChange) {
+      if (this.mode === "shared") {
+        return this.db.collection("profiles").orderBy("createdAt", "asc").limit(200)
+          .onSnapshot(function (snap) {
+            onChange(snap.docs.map(function (d) { return Object.assign({ id: d.id }, d.data()); }));
+          }, function () { onChange([]); });
+      }
+      var data = loadLocal();
+      var list = Object.keys(data.profiles).map(function (id) {
+        return Object.assign({ id: id }, data.profiles[id]);
+      }).sort(function (a, b) { return (a.createdAt || 0) - (b.createdAt || 0); });
+      onChange(list);
+      return function () {};
+    },
+
+    createProfile: function (profile) {
+      var id = uid("p");
+      var body = Object.assign({ createdAt: Date.now() }, profile);
+      if (this.mode === "shared") {
+        return this.db.doc("profiles/" + id).set(body).then(function () { return id; });
+      }
+      var data = loadLocal();
+      data.profiles[id] = body;
+      saveLocal(data);
+      return Promise.resolve(id);
+    },
+
+    entryDocId: function (profileId, date) { return profileId + "__" + date; },
+
+    watchEntry: function (profileId, date, onChange) {
+      var id = this.entryDocId(profileId, date);
+      if (this.mode === "shared") {
+        return this.db.doc("entries/" + id).onSnapshot(function (snap) {
+          onChange(snap.exists ? snap.data().items || [] : []);
+        }, function () { onChange([]); });
+      }
+      var data = loadLocal();
+      onChange((data.entries[id] && data.entries[id].items) || []);
+      return function () {};
+    },
+
+    saveEntry: function (profileId, date, items) {
+      var id = this.entryDocId(profileId, date);
+      if (this.mode === "shared") {
+        return this.db.doc("entries/" + id).set({ profileId: profileId, date: date, items: items, updatedAt: Date.now() });
+      }
+      var data = loadLocal();
+      data.entries[id] = { profileId: profileId, date: date, items: items, updatedAt: Date.now() };
+      saveLocal(data);
+      return Promise.resolve();
+    },
+
+    history: function (profileId, limitN) {
+      if (this.mode === "shared") {
+        return this.db.collection("entries").where("profileId", "==", profileId)
+          .orderBy("date", "desc").limit(limitN || 60).get()
+          .then(function (snap) { return snap.docs.map(function (d) { return d.data(); }); });
+      }
+      var data = loadLocal();
+      var list = Object.keys(data.entries)
+        .map(function (k) { return data.entries[k]; })
+        .filter(function (e) { return e.profileId === profileId; })
+        .sort(function (a, b) { return a.date < b.date ? 1 : -1; })
+        .slice(0, limitN || 60);
+      return Promise.resolve(list);
+    }
+  };
+
+  // ---------------------------------------------------------------
+  // App state
+  // ---------------------------------------------------------------
+  var PROFILE_KEY = "kkinipyo_my_profile_id";
+  var state = {
+    booted: false,
+    profile: null,
+    profiles: [],
+    tab: "today",
+    date: todayStr(),
+    items: [],
+    history: [],
+    newName: "",
+    newAge: "1929",
+    newGender: "M",
+    selectedMeal: "아침"
+  };
+  var unsubEntry = null;
+  var unsubProfiles = null;
+
+  function myTarget() {
+    return TARGETS[groupKey(state.profile.gender, state.profile.ageBand)];
+  }
+
+  // ---------------------------------------------------------------
+  // Rendering
+  // ---------------------------------------------------------------
+  var root = document.getElementById("app");
+
+  function render() {
+    root.innerHTML = state.profile ? renderApp() : renderGate();
+    bindEvents();
+  }
+
+  function bannerHtml() {
+    if (Store.mode !== "local") return "";
+    return '<div class="banner">지금은 공유 저장소에 연결되지 않아 이 브라우저에만 기록이 저장돼요. 팀원과 공유하려면 이 페이지를 아티팩트로 게시된 링크에서 열어주세요.</div>';
+  }
+
+  function renderGate() {
+    var rows = state.profiles.map(function (p) {
+      return '<button class="profile-row" data-select="' + p.id + '">' +
+        '<span><span class="p-name">' + escapeHtml(p.name) + '</span>' +
+        '<div class="p-meta">' + groupLabel(p.gender, p.ageBand) + '</div></span>' +
+        '<span class="arrow">→</span></button>';
+    }).join("");
+
+    return '' +
+      '<div class="masthead"><h1 class="brand">끼니표</h1>' +
+      '<div class="brand-sub">동료들과 함께 쓰는 하루 영양 기록장</div></div>' +
+      '<div class="gate">' +
+      '<p class="lead">이름을 골라 들어가세요. 기록은 함께 쓰는 저장소에 남지만, 화면에는 내가 고른 이름의 기록만 보여요 — 팀 안에서 서로 믿고 쓰는 캐주얼한 방식이니 본인 이름만 선택해주세요.</p>' +
+      bannerHtml() +
+      '<div class="gate-section"><h2>내 이름 선택</h2>' +
+      '<div class="profile-list">' + (rows || '<div class="empty-note">아직 등록된 사람이 없어요. 아래에서 새로 만들어보세요.</div>') + '</div>' +
+      '</div>' +
+      '<div class="gate-section"><h2>새로 시작하기</h2>' +
+      '<form id="new-profile-form">' +
+      '<div class="field"><label for="np-name">이름 / 닉네임</label>' +
+      '<input type="text" id="np-name" placeholder="예: 김민지" maxlength="20" autocomplete="off" required></div>' +
+      '<div class="field"><label>나이대</label><div class="radio-row" id="np-age">' +
+      radioPill("age", "1929", "20대 (19~29세)", state.newAge === "1929") +
+      radioPill("age", "3049", "30대 (30~49세)", state.newAge === "3049") +
+      '</div></div>' +
+      '<div class="field"><label>성별</label><div class="radio-row" id="np-gender">' +
+      radioPill("gender", "M", "남성", state.newGender === "M") +
+      radioPill("gender", "F", "여성", state.newGender === "F") +
+      '</div></div>' +
+      '<button type="submit" class="btn-primary">시작하기</button>' +
+      '</form></div>' +
+      '<div class="footnote">성별·나이대별 목표치는 보건복지부·한국영양학회의 한국인 영양소 섭취기준(KDRIs)을 바탕으로 미리 설정되어 있어요.</div>' +
+      '</div>';
+  }
+
+  function radioPill(group, value, label, checked) {
+    return '<label class="radio-pill' + (checked ? " checked" : "") + '" data-radio-group="' + group + '" data-radio-value="' + value + '">' +
+      '<input type="radio" name="np-' + group + '" value="' + value + '"' + (checked ? " checked" : "") + '>' + label + '</label>';
+  }
+
+  function renderApp() {
+    var t = myTarget();
+    return '' +
+      '<div class="masthead"><div class="masthead-row">' +
+      '<div><h1 class="brand">끼니표</h1><div class="brand-sub">동료들과 함께 쓰는 하루 영양 기록장</div></div>' +
+      '<div class="profile-chip"><span><span class="name">' + escapeHtml(state.profile.name) + '</span>' +
+      '<div class="meta">' + groupLabel(state.profile.gender, state.profile.ageBand) + ' · 목표 ' + t.kcal + 'kcal</div></span>' +
+      '<button data-action="switch-profile">다른 사람으로</button></div>' +
+      '</div>' + bannerHtml() + '</div>' +
+      '<div class="tabs" role="tablist">' +
+      '<button class="tab-btn" role="tab" aria-selected="' + (state.tab === "today") + '" data-tab="today">오늘의 기록</button>' +
+      '<button class="tab-btn" role="tab" aria-selected="' + (state.tab === "history") + '" data-tab="history">히스토리</button>' +
+      '</div>' +
+      (state.tab === "today" ? renderToday() : renderHistory());
+  }
+
+  function renderToday() {
+    var t = myTarget();
+    var totals = {};
+    NUTRIENTS.forEach(function (n) { totals[n.key] = round1(sumItems(state.items, n.key)); });
+
+    var badNutrients = [], warnNutrients = [];
+    NUTRIENTS.forEach(function (n) {
+      var tone = judge(n.kind, t[n.key], totals[n.key]);
+      if (tone === "bad") badNutrients.push(n.label);
+      if (tone === "warn") warnNutrients.push(n.label);
+    });
+    var summaryTone = badNutrients.length ? "warn" : "ok";
+    var summaryText;
+    if (!badNutrients.length && !warnNutrients.length) {
+      summaryText = "오늘 기록은 8개 영양소 모두 적정 범위예요.";
+    } else {
+      var parts = [];
+      if (badNutrients.length) parts.push(badNutrients.join(", ") + " 초과");
+      if (warnNutrients.length) parts.push(warnNutrients.join(", ") + " 부족");
+      summaryText = parts.join(" · ") + "예요.";
+    }
+
+    var byMeal = {};
+    MEALS.forEach(function (m) { byMeal[m] = []; });
+    state.items.forEach(function (it) { (byMeal[it.meal] || (byMeal[it.meal] = [])).push(it); });
+
+    var mealsHtml = MEALS.map(function (m) {
+      var list = byMeal[m] || [];
+      if (!list.length) return "";
+      var rows = list.map(function (it) {
+        return '<div class="food-item"><span><span class="fi-name">' + escapeHtml(it.name) + '</span>' +
+          '<div class="fi-nums">' + it.kcal + 'kcal · 탄' + it.carb + ' 단' + it.protein + ' 지' + it.fat + '</div></span>' +
+          '<button class="fi-del" data-del-item="' + it.id + '" title="삭제">✕</button></div>';
+      }).join("");
+      return '<div class="meal-group"><div class="meal-title">' + m + '</div>' + rows + '</div>';
+    }).join("");
+    if (!state.items.length) mealsHtml = '<div class="no-items">아직 기록한 음식이 없어요. 아래 양식으로 추가해보세요.</div>';
+
+    var gaugesHtml = NUTRIENTS.map(function (n) {
+      var consumed = totals[n.key];
+      var target = t[n.key];
+      var tone = judge(n.kind, target, consumed);
+      var g = gaugeModel(n.kind, target, consumed);
+      return '<div class="nrow"><div class="nrow-head"><span class="nlabel">' + n.label + '</span>' +
+        '<span class="chip" data-tone="' + tone + '">' + statusLabel(n.kind, tone) + '</span></div>' +
+        '<div class="gauge"><div class="gauge-zone" style="left:' + g.zoneStartPct + '%;width:' + Math.max(0, g.zoneEndPct - g.zoneStartPct) + '%"></div>' +
+        '<div class="gauge-fill" data-tone="' + tone + '" style="width:' + g.fillPct + '%"></div></div>' +
+        '<div class="nrow-nums"><span><span class="consumed">' + consumed + '</span> ' + n.unit + ' 섭취</span>' +
+        '<span>목표 ' + targetText(n, target) + '</span></div></div>';
+    }).join("");
+
+    return '' +
+      '<div class="app-grid">' +
+      '<div>' +
+      '<div class="panel">' +
+      '<div class="date-row"><input type="date" id="date-input" value="' + state.date + '" max="' + todayStr() + '">' +
+      (state.date !== todayStr() ? '<button class="today-btn" data-action="go-today">오늘로</button>' : '') + '</div>' +
+      '<h2>' + fmtDate(state.date) + ' 식사 추가</h2>' +
+      '<p class="sub">음식명을 입력하면 ' + FOOD_DB.length + '개 음식 데이터베이스에서 평균 영양정보를 자동으로 채워줘요. 여러 개를 한번에 먹었다면 쉼표(,)로 구분해서 적으면 바로 합산돼요 (예: 현미밥, 배추김치, 계란찜). 직접 수정도 가능해요.</p>' +
+      '<form id="food-form"><div class="food-form-grid">' +
+      '<div class="span2"><label for="f-meal">끼니</label><select id="f-meal">' +
+      MEALS.map(function (m) { return '<option value="' + m + '"' + (m === state.selectedMeal ? " selected" : "") + '>' + m + '</option>'; }).join("") + '</select></div>' +
+      '<div class="span2 food-name-field"><label for="f-name">음식명</label>' +
+      '<input type="text" id="f-name" placeholder="예: 현미밥 (여러 개는 현미밥, 배추김치 처럼 쉼표로)" autocomplete="off" required>' +
+      '<div id="food-suggest" class="suggest-list" hidden></div>' +
+      '<div id="food-link-chip" class="link-chip" hidden></div>' +
+      '</div>' +
+      numField("f-kcal", "열량 (kcal)") + numField("f-carb", "탄수화물 (g)") +
+      numField("f-protein", "단백질 (g)") + numField("f-fat", "지방 (g)") +
+      numField("f-satfat", "포화지방 (g)") + numField("f-sugar", "당류 (g)") +
+      numField("f-sodium", "나트륨 (mg)") + numField("f-fiber", "식이섬유 (g)") +
+      '</div><button type="submit" class="add-btn">+ 식사에 추가</button></form>' +
+      '</div>' +
+      '<div class="panel">' +
+      '<h2>' + fmtDate(state.date) + ' 먹은 음식</h2>' +
+      mealsHtml +
+      '</div>' +
+      '</div>' +
+      '<div class="panel" style="position:sticky; top:16px;">' +
+      '<h2>영양 요약</h2><p class="sub">' + groupLabel(state.profile.gender, state.profile.ageBand) + ' 기준</p>' +
+      '<div class="summary-line" data-tone="' + summaryTone + '">' + summaryText + '</div>' +
+      gaugesHtml +
+      '</div>' +
+      '</div>';
+  }
+
+  function numField(id, label) {
+    return '<div><label for="' + id + '">' + label + '</label><input type="number" min="0" step="0.1" inputmode="decimal" id="' + id + '" value="0"></div>';
+  }
+
+  function renderHistory() {
+    if (!state.history.length) {
+      return '<div class="panel"><p class="sub">아직 기록된 날짜가 없어요. 오늘의 기록 탭에서 식사를 추가하면 여기 쌓여요.</p></div>';
+    }
+    var t = myTarget();
+    var rows = state.history.map(function (h) {
+      var totals = {};
+      NUTRIENTS.forEach(function (n) { totals[n.key] = round1(sumItems(h.items || [], n.key)); });
+      var dots = NUTRIENTS.map(function (n) {
+        var tone = judge(n.kind, t[n.key], totals[n.key]);
+        return '<span class="dot" data-tone="' + tone + '" title="' + n.label + '"></span>';
+      }).join("");
+      return '<button class="history-row" data-history-date="' + h.date + '">' +
+        '<span><span class="h-date">' + h.date + '</span><div class="h-kcal">' + totals.kcal + ' / ' + t.kcal + ' kcal</div></span>' +
+        '<span class="dot-row">' + dots + '</span></button>';
+    }).join("");
+    return '<div class="panel"><h2>지난 기록</h2><p class="sub">날짜를 누르면 오늘의 기록 탭에서 그 날짜를 다시 볼 수 있어요.</p>' +
+      '<div class="history-list">' + rows + '</div></div>';
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+
+  // ---------------------------------------------------------------
+  // Events
+  // ---------------------------------------------------------------
+  function bindEvents() {
+    var newProfileForm = document.getElementById("new-profile-form");
+    if (newProfileForm) {
+      root.querySelectorAll('[data-radio-group]').forEach(function (label) {
+        label.addEventListener("click", function () {
+          var group = label.getAttribute("data-radio-group");
+          var value = label.getAttribute("data-radio-value");
+          if (group === "age") state.newAge = value; else state.newGender = value;
+          render();
+        });
+      });
+      newProfileForm.addEventListener("submit", function (e) {
+        e.preventDefault();
+        var name = document.getElementById("np-name").value.trim();
+        if (!name) return;
+        Store.createProfile({ name: name, ageBand: state.newAge, gender: state.newGender }).then(function (id) {
+          localStorage.setItem(PROFILE_KEY, id);
+          enterProfile({ id: id, name: name, ageBand: state.newAge, gender: state.newGender });
+        });
+      });
+      root.querySelectorAll("[data-select]").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          var id = btn.getAttribute("data-select");
+          var p = state.profiles.find(function (x) { return x.id === id; });
+          if (!p) return;
+          localStorage.setItem(PROFILE_KEY, id);
+          enterProfile(p);
+        });
+      });
+      return;
+    }
+
+    var switchBtn = root.querySelector('[data-action="switch-profile"]');
+    if (switchBtn) switchBtn.addEventListener("click", function () {
+      localStorage.removeItem(PROFILE_KEY);
+      if (unsubEntry) unsubEntry();
+      state.profile = null;
+      state.items = [];
+      render();
+    });
+
+    root.querySelectorAll("[data-tab]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        state.tab = btn.getAttribute("data-tab");
+        if (state.tab === "history") loadHistory();
+        render();
+      });
+    });
+
+    var dateInput = document.getElementById("date-input");
+    if (dateInput) dateInput.addEventListener("change", function () {
+      loadEntry(dateInput.value);
+    });
+    var goToday = root.querySelector('[data-action="go-today"]');
+    if (goToday) goToday.addEventListener("click", function () { loadEntry(todayStr()); });
+
+    var mealSelect = document.getElementById("f-meal");
+    if (mealSelect) mealSelect.addEventListener("change", function () {
+      state.selectedMeal = mealSelect.value;
+    });
+
+    var nameInput = document.getElementById("f-name");
+    var suggestBox = document.getElementById("food-suggest");
+    var chipBox = document.getElementById("food-link-chip");
+    var linkedFood = null;
+
+    function hideSuggest() {
+      if (suggestBox) { suggestBox.hidden = true; suggestBox.innerHTML = ""; }
+    }
+
+    function showChip(food, qty) {
+      if (!chipBox) return;
+      chipBox.hidden = false;
+      chipBox.innerHTML = '<span>🔗 <b>' + escapeHtml(food.name) + '</b> · ' + escapeHtml(food.servingDesc) + ' 기준</span>' +
+        '<label>인분(배수) <input type="number" id="f-qty" min="0.1" step="0.1" value="' + qty + '"></label>' +
+        '<button type="button" id="f-unlink">수동 입력으로 전환</button>';
+      var qtyInput = document.getElementById("f-qty");
+      qtyInput.addEventListener("input", function () {
+        var q = parseFloat(qtyInput.value);
+        if (!isFinite(q) || q < 0) return;
+        fillNutrientsFromFood(food, q);
+      });
+      document.getElementById("f-unlink").addEventListener("click", function () {
+        linkedFood = null;
+        chipBox.hidden = true;
+        chipBox.innerHTML = "";
+      });
+    }
+
+    function selectFood(food) {
+      linkedFood = food;
+      nameInput.value = food.name;
+      hideSuggest();
+      fillNutrientsFromFood(food, 1);
+      showChip(food, 1);
+    }
+
+    // ---- 여러 음식을 한번에 입력하면(쉼표/plus로 구분) 즉시 합산 ----
+    var COMBO_SEP_RE = /[,、，+]/;
+    function matchFoodExact(token) {
+      var t = String(token || "").trim().toLowerCase();
+      if (!t) return null;
+      for (var i = 0; i < FOOD_SEARCH_INDEX.length; i++) {
+        if (FOOD_SEARCH_INDEX[i].terms.indexOf(t) !== -1) return FOOD_SEARCH_INDEX[i].food;
+      }
+      return null;
+    }
+    function matchFoodBest(token) {
+      return matchFoodExact(token) || searchFood(token)[0] || null;
+    }
+    function computeCombo(tokens) {
+      var matched = [], unmatched = [];
+      tokens.forEach(function (tok) {
+        var t = tok.trim();
+        if (!t) return;
+        var food = matchFoodBest(t);
+        if (food) matched.push(food); else unmatched.push(t);
+      });
+      var sums = {};
+      Object.keys(FOOD_FIELD_IDS).forEach(function (key) { sums[key] = 0; });
+      matched.forEach(function (food) {
+        Object.keys(FOOD_FIELD_IDS).forEach(function (key) { sums[key] += food[key] || 0; });
+      });
+      return { matched: matched, unmatched: unmatched, sums: sums };
+    }
+    function showComboChip(combo, qty) {
+      if (!chipBox) return;
+      chipBox.hidden = false;
+      var namesHtml = combo.matched.map(function (f) { return escapeHtml(f.name); }).join(" + ") || "(매칭된 음식 없음)";
+      var warnHtml = combo.unmatched.length
+        ? ' <span style="color:var(--bad)">· 못 찾음: ' + escapeHtml(combo.unmatched.join(", ")) + ' (해당 칸은 직접 입력해주세요)</span>'
+        : "";
+      chipBox.innerHTML = '<span>🔗 <b>' + namesHtml + '</b> 합산' + warnHtml + '</span>' +
+        '<label>배수 <input type="number" id="f-qty" min="0.1" step="0.1" value="' + qty + '"></label>' +
+        '<button type="button" id="f-unlink">수동 입력으로 전환</button>';
+      var qtyInput = document.getElementById("f-qty");
+      qtyInput.addEventListener("input", function () {
+        var q = parseFloat(qtyInput.value);
+        if (!isFinite(q) || q < 0) return;
+        fillNutrientsFromFood(combo.sums, q);
+      });
+      document.getElementById("f-unlink").addEventListener("click", function () {
+        linkedFood = null;
+        chipBox.hidden = true;
+        chipBox.innerHTML = "";
+      });
+    }
+
+    if (nameInput) {
+      nameInput.addEventListener("input", function () {
+        var raw = nameInput.value;
+        if (COMBO_SEP_RE.test(raw)) {
+          hideSuggest();
+          var tokens = raw.split(COMBO_SEP_RE).map(function (s) { return s.trim(); }).filter(Boolean);
+          var combo = tokens.length ? computeCombo(tokens) : null;
+          if (combo && combo.matched.length) {
+            linkedFood = { combo: true };
+            fillNutrientsFromFood(combo.sums, 1);
+            showComboChip(combo, 1);
+          } else if (chipBox) {
+            linkedFood = null;
+            chipBox.hidden = true;
+            chipBox.innerHTML = "";
+          }
+          return;
+        }
+        var matches = searchFood(raw);
+        if (!matches.length) { hideSuggest(); return; }
+        suggestBox.innerHTML = matches.map(function (f) {
+          var idx = FOOD_DB.indexOf(f);
+          var tagText = (f.cuisine ? f.cuisine + " · " : "") + f.servingDesc;
+          return '<div class="suggest-item" data-food-idx="' + idx + '">' +
+            '<span>' + escapeHtml(f.name) + '</span><span class="s-serving">' + escapeHtml(tagText) + '</span></div>';
+        }).join("");
+        suggestBox.hidden = false;
+        suggestBox.querySelectorAll("[data-food-idx]").forEach(function (row) {
+          row.addEventListener("mousedown", function (e) {
+            e.preventDefault();
+            var idx = parseInt(row.getAttribute("data-food-idx"), 10);
+            selectFood(FOOD_DB[idx]);
+          });
+        });
+      });
+      nameInput.addEventListener("blur", function () { setTimeout(hideSuggest, 120); });
+      nameInput.addEventListener("keydown", function (e) { if (e.key === "Escape") hideSuggest(); });
+    }
+
+    Object.keys(FOOD_FIELD_IDS).forEach(function (key) {
+      var el = document.getElementById(FOOD_FIELD_IDS[key]);
+      if (el) el.addEventListener("input", function () {
+        if (linkedFood) {
+          linkedFood = null;
+          if (chipBox) { chipBox.hidden = true; chipBox.innerHTML = ""; }
+        }
+      });
+    });
+
+    var foodForm = document.getElementById("food-form");
+    if (foodForm) foodForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var name = document.getElementById("f-name").value.trim();
+      if (!name) return;
+      var item = {
+        id: uid("i"),
+        meal: document.getElementById("f-meal").value,
+        name: name,
+        kcal: num(document.getElementById("f-kcal").value),
+        carb: num(document.getElementById("f-carb").value),
+        protein: num(document.getElementById("f-protein").value),
+        fat: num(document.getElementById("f-fat").value),
+        satfat: num(document.getElementById("f-satfat").value),
+        sugar: num(document.getElementById("f-sugar").value),
+        sodium: num(document.getElementById("f-sodium").value),
+        fiber: num(document.getElementById("f-fiber").value)
+      };
+      var next = state.items.concat([item]);
+      Store.saveEntry(state.profile.id, state.date, next).then(function () {
+        if (Store.mode === "local") { state.items = next; render(); }
+      });
+    });
+
+    root.querySelectorAll("[data-del-item]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var id = btn.getAttribute("data-del-item");
+        var next = state.items.filter(function (it) { return it.id !== id; });
+        Store.saveEntry(state.profile.id, state.date, next).then(function () {
+          if (Store.mode === "local") { state.items = next; render(); }
+        });
+      });
+    });
+
+    root.querySelectorAll("[data-history-date]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var date = btn.getAttribute("data-history-date");
+        state.tab = "today";
+        loadEntry(date);
+      });
+    });
+  }
+
+  // ---------------------------------------------------------------
+  // Data loading
+  // ---------------------------------------------------------------
+  function loadEntry(date) {
+    if (unsubEntry) unsubEntry();
+    state.date = date;
+    unsubEntry = Store.watchEntry(state.profile.id, date, function (items) {
+      state.items = items;
+      render();
+    });
+  }
+
+  function loadHistory() {
+    Store.history(state.profile.id, 90).then(function (list) {
+      state.history = list;
+      render();
+    });
+  }
+
+  function enterProfile(p) {
+    state.profile = p;
+    if (unsubProfiles) { unsubProfiles(); unsubProfiles = null; }
+    loadEntry(todayStr());
+    render();
+  }
+
+  // ---------------------------------------------------------------
+  // Boot
+  // ---------------------------------------------------------------
+  function boot() {
+    Store.init().then(function () {
+      var savedId = null;
+      try { savedId = localStorage.getItem(PROFILE_KEY); } catch (e) {}
+
+      unsubProfiles = Store.listProfiles(function (profiles) {
+        state.profiles = profiles;
+        if (!state.booted) {
+          state.booted = true;
+          if (savedId) {
+            var mine = profiles.find(function (p) { return p.id === savedId; });
+            if (mine) { enterProfile(mine); return; }
+          }
+          render();
+        } else if (!state.profile) {
+          render();
+        }
+      });
+    });
+  }
+
+  boot();
+})();
+</script>
