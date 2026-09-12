@@ -154,6 +154,8 @@
     background: var(--surface); color: var(--ink);
   }
   .radio-row { display: flex; gap: 8px; }
+  .radio-row.age-row { flex-wrap: wrap; }
+  .radio-row.age-row .radio-pill { flex: 1 1 28%; min-width: 64px; }
   .radio-pill {
     flex: 1; border: 1px solid var(--line); border-radius: 8px; padding: 9px 10px;
     text-align: center; font-size: 13px; background: var(--surface); position: relative;
@@ -282,12 +284,41 @@
   // ---------------------------------------------------------------
   // Reference data: 2020/2025 한국인 영양소 섭취기준 기반 그룹별 목표치
   // ---------------------------------------------------------------
-  var TARGETS = {
-    "M-1929": { kcal: 2600, protein: 65, carb: [358, 423], fat: [43, 87], satfat: 20, sugar: 65, sodium: 2300, fiber: 30 },
-    "F-1929": { kcal: 2000, protein: 55, carb: [275, 325], fat: [33, 67], satfat: 16, sugar: 50, sodium: 2300, fiber: 20 },
-    "M-3049": { kcal: 2500, protein: 65, carb: [344, 406], fat: [42, 83], satfat: 19, sugar: 63, sodium: 2300, fiber: 30 },
-    "F-3049": { kcal: 1900, protein: 50, carb: [261, 309], fat: [32, 63], satfat: 15, sugar: 48, sodium: 2300, fiber: 20 }
-  };
+  // 에너지필요추정량(kcal) 기준으로 탄수화물/지방/포화지방/당류 상한을 같은 비율식으로 도출
+  // (탄수화물 55~65%, 지방 15~30%, 포화지방 7% 미만, 첨가당 10% 이내 — 기존 19-29/30-49 수치와 동일한 공식)
+  function deriveMacros(kcal) {
+    return {
+      kcal: kcal,
+      carb: [Math.round(kcal * 0.55 / 4), Math.round(kcal * 0.65 / 4)],
+      fat: [Math.round(kcal * 0.15 / 9), Math.round(kcal * 0.30 / 9)],
+      satfat: Math.round(kcal * 0.07 / 9),
+      sugar: Math.round(kcal * 0.10 / 4),
+      sodium: 2300
+    };
+  }
+
+  // 연령대별 기준치 원천 데이터 — 2020 한국인 영양소 섭취기준(KDRIs)의 공식 연령 구간
+  // (19-29 / 30-49 / 50-64 / 65-74 / 75+)을 10년 단위 연령대에 맞춰 배정한 값
+  // (30대·40대는 공식 구간이 "30-49"로 같아 같은 값을 공유, 60대는 65-74, 70대는 75+ 구간을 사용)
+  var AGE_GROUPS = [
+    { code: "20", kcalM: 2600, kcalF: 2000, proteinM: 65, proteinF: 55, fiberM: 30, fiberF: 20 },
+    { code: "30", kcalM: 2500, kcalF: 1900, proteinM: 65, proteinF: 50, fiberM: 30, fiberF: 20 },
+    { code: "40", kcalM: 2500, kcalF: 1900, proteinM: 65, proteinF: 50, fiberM: 30, fiberF: 20 },
+    { code: "50", kcalM: 2200, kcalF: 1800, proteinM: 60, proteinF: 50, fiberM: 25, fiberF: 20 },
+    { code: "60", kcalM: 2000, kcalF: 1600, proteinM: 60, proteinF: 45, fiberM: 25, fiberF: 20 },
+    { code: "70", kcalM: 1900, kcalF: 1500, proteinM: 60, proteinF: 45, fiberM: 21, fiberF: 17 }
+  ];
+
+  var TARGETS = {};
+  AGE_GROUPS.forEach(function (g) {
+    TARGETS["M-" + g.code] = Object.assign(deriveMacros(g.kcalM), { protein: g.proteinM, fiber: g.fiberM });
+    TARGETS["F-" + g.code] = Object.assign(deriveMacros(g.kcalF), { protein: g.proteinF, fiber: g.fiberF });
+  });
+  // 예전 프로필(19~29세/30~49세 구간 코드)이 그대로 동작하도록 남겨두는 별칭
+  TARGETS["M-1929"] = TARGETS["M-20"];
+  TARGETS["F-1929"] = TARGETS["F-20"];
+  TARGETS["M-3049"] = TARGETS["M-30"];
+  TARGETS["F-3049"] = TARGETS["F-30"];
 
   var NUTRIENTS = [
     { key: "kcal",    label: "열량",    unit: "kcal", kind: "band" },
@@ -334,8 +365,10 @@
   }
 
   function groupKey(gender, ageBand) { return gender + "-" + ageBand; }
+  var LEGACY_AGE_LABELS = { "1929": "20대", "3049": "30대" };
   function groupLabel(gender, ageBand) {
-    return (ageBand === "1929" ? "20대" : "30대") + " " + (gender === "M" ? "남성" : "여성");
+    var ageText = LEGACY_AGE_LABELS[ageBand] || (ageBand + "대");
+    return ageText + " " + (gender === "M" ? "남성" : "여성");
   }
 
   // ---------------------------------------------------------------
@@ -519,7 +552,7 @@
     items: [],
     history: [],
     newName: "",
-    newAge: "1929",
+    newAge: "20",
     newGender: "M",
     selectedMeal: "아침"
   };
@@ -566,9 +599,8 @@
       '<form id="new-profile-form">' +
       '<div class="field"><label for="np-name">이름 / 닉네임</label>' +
       '<input type="text" id="np-name" placeholder="예: 김민지" maxlength="20" autocomplete="off" required></div>' +
-      '<div class="field"><label>나이대</label><div class="radio-row" id="np-age">' +
-      radioPill("age", "1929", "20대 (19~29세)", state.newAge === "1929") +
-      radioPill("age", "3049", "30대 (30~49세)", state.newAge === "3049") +
+      '<div class="field"><label>나이대</label><div class="radio-row age-row" id="np-age">' +
+      AGE_GROUPS.map(function (g) { return radioPill("age", g.code, g.code + "대", state.newAge === g.code); }).join("") +
       '</div></div>' +
       '<div class="field"><label>성별</label><div class="radio-row" id="np-gender">' +
       radioPill("gender", "M", "남성", state.newGender === "M") +
@@ -576,7 +608,7 @@
       '</div></div>' +
       '<button type="submit" class="btn-primary">시작하기</button>' +
       '</form></div>' +
-      '<div class="footnote">성별·나이대별 목표치는 보건복지부·한국영양학회의 한국인 영양소 섭취기준(KDRIs)을 바탕으로 미리 설정되어 있어요.</div>' +
+      '<div class="footnote">성별·나이대별 목표치는 보건복지부·한국영양학회의 한국인 영양소 섭취기준(KDRIs)을 바탕으로 미리 설정되어 있어요. KDRIs는 19~29 / 30~49 / 50~64 / 65~74 / 75세 이상 구간으로 나뉘어 있어서, 30·40대는 같은 기준(30~49세)을 공유하고 60·70대는 각각 65~74세·75세 이상 구간 값을 사용해요.</div>' +
       '</div>';
   }
 
