@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>미팅클립 - AI 회의 정리 서비스</title>
+<style>
+  :root {
+    --bg: #f7f8fa;
+    --surface: #ffffff;
+    --border: #e2e5ea;
+    --text: #1b1f27;
+    --text-muted: #5b6270;
+    --primary: #2f6fed;
+    --primary-dark: #1f56c9;
+    --accent-bg: #eef3ff;
+    --tag-bg: #fff4e0;
+    --tag-text: #8a5a00;
+    --radius: 12px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14161c;
+      --surface: #1c1f27;
+      --border: #2c303a;
+      --text: #eef0f4;
+      --text-muted: #9aa1af;
+      --primary: #5b8dff;
+      --primary-dark: #4576f0;
+      --accent-bg: #1c2740;
+      --tag-bg: #3a2f14;
+      --tag-text: #f2c675;
+    }
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Apple SD Gothic Neo", "Malgun Gothic", "Segoe UI", sans-serif;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 32px 20px 80px;
+  }
+
+  header.hero {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+
+  .logo-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--primary);
+    background: var(--accent-bg);
+    padding: 6px 14px;
+    border-radius: 999px;
+    margin-bottom: 16px;
+  }
+
+  h1 {
+    font-size: 28px;
+    margin: 0 0 10px;
+    letter-spacing: -0.02em;
+  }
+
+  .subtitle {
+    font-size: 16px;
+    color: var(--text-muted);
+    margin: 0;
+  }
+
+  /* 사용 순서 안내 */
+  .guide {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+
+  .guide-step {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 14px;
+    text-align: center;
+  }
+
+  .guide-step .num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .guide-step p {
+    margin: 0;
+    font-size: 13.5px;
+    color: var(--text-muted);
+  }
+
+  .guide-step strong {
+    display: block;
+    font-size: 14px;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+
+  /* 카드 공통 */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+
+  .card h2 {
+    font-size: 15px;
+    margin: 0 0 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  textarea#meetingInput {
+    width: 100%;
+    min-height: 220px;
+    resize: vertical;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+    font-size: 15px;
+    font-family: inherit;
+    color: var(--text);
+    background: var(--bg);
+    line-height: 1.6;
+  }
+
+  textarea#meetingInput:focus {
+    outline: none;
+    border-color: var(--primary);
+  }
+
+  .input-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .char-count {
+    font-size: 12.5px;
+    color: var(--text-muted);
+  }
+
+  button#summarizeBtn {
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 13px 22px;
+    font-size: 15.5px;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+    transition: background 0.15s ease;
+  }
+
+  button#summarizeBtn:hover {
+    background: var(--primary-dark);
+  }
+
+  button#summarizeBtn:disabled {
+    background: var(--border);
+    color: var(--text-muted);
+    cursor: not-allowed;
+  }
+
+  .sample-link {
+    background: none;
+    border: none;
+    color: var(--primary);
+    font-size: 13px;
+    cursor: pointer;
+    padding: 0;
+    text-decoration: underline;
+  }
+
+  .input-hint {
+    margin: 0 0 12px;
+    font-size: 13.5px;
+    color: var(--text-muted);
+  }
+
+  .input-example {
+    background: var(--accent-bg);
+    border: 1px dashed var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-bottom: 14px;
+  }
+
+  .input-example .label {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 4px;
+  }
+
+  .input-example p {
+    margin: 0;
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  /* 결과 영역 */
+  #resultArea {
+    min-height: 120px;
+  }
+
+  .empty-state {
+    color: var(--text-muted);
+    font-size: 14px;
+    text-align: center;
+    padding: 30px 10px;
+  }
+
+  .result-section {
+    margin-bottom: 18px;
+  }
+
+  .result-section:last-child {
+    margin-bottom: 0;
+  }
+
+  .result-section h3 {
+    font-size: 13.5px;
+    color: var(--text-muted);
+    margin: 0 0 8px;
+    font-weight: 600;
+  }
+
+  .result-section ul {
+    margin: 0;
+    padding-left: 20px;
+  }
+
+  .result-section li {
+    margin-bottom: 6px;
+    font-size: 14.5px;
+  }
+
+  .action-tag {
+    display: inline-block;
+    background: var(--tag-bg);
+    color: var(--tag-text);
+    font-size: 11.5px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 5px;
+    margin-right: 6px;
+    vertical-align: middle;
+  }
+
+  .demo-note {
+    margin-top: 16px;
+    font-size: 12.5px;
+    color: var(--text-muted);
+    border-top: 1px dashed var(--border);
+    padding-top: 12px;
+  }
+
+  footer {
+    text-align: center;
+    font-size: 12.5px;
+    color: var(--text-muted);
+    margin-top: 30px;
+  }
+
+  @media (max-width: 560px) {
+    .guide {
+      grid-template-columns: 1fr;
+    }
+    h1 {
+      font-size: 23px;
+    }
+    .wrap {
+      padding: 24px 16px 60px;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <span class="logo-badge">✦ 미팅클립</span>
+    <h1>회의 내용을 붙여넣으면, 핵심만 정리해 드려요</h1>
+    <p class="subtitle">긴 회의록도 30초면 요약과 할 일 목록으로 정리됩니다.</p>
+  </header>
+
+  <section class="guide" aria-label="사용 방법">
+    <div class="guide-step">
+      <span class="num">1</span>
+      <strong>회의 내용 붙여넣기</strong>
+      <p>회의록, 녹취 텍스트 등을 입력창에 붙여넣으세요.</p>
+    </div>
+    <div class="guide-step">
+      <span class="num">2</span>
+      <strong>버튼 클릭</strong>
+      <p>'회의 내용 정리하기' 버튼을 눌러주세요.</p>
+    </div>
+    <div class="guide-step">
+      <span class="num">3</span>
+      <strong>결과 확인</strong>
+      <p>핵심 요약과 할 일 목록을 바로 확인하세요.</p>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>📝 회의 내용 입력</h2>
+    <p class="input-hint">회의 중 나눈 대화나 회의록, 녹취 텍스트를 있는 그대로 붙여넣으세요. 담당자, 결정 사항, 할 일이 포함되어 있으면 더 정확하게 정리돼요.</p>
+    <div class="input-example">
+      <span class="label">입력 예시</span>
+      <p>"오늘 회의에서는 3분기 마케팅 전략에 대해 논의했습니다. 김대리가 다음 주까지 경쟁사 분석 자료를 정리하기로 했습니다. 예산은 기존 대비 10% 증액하는 것으로 결정되었습니다."</p>
+    </div>
+    <textarea id="meetingInput" placeholder="예)&#10;오늘 회의에서는 3분기 마케팅 전략에 대해 논의했습니다.&#10;김대리가 다음 주까지 경쟁사 분석 자료를 정리하기로 했습니다.&#10;예산은 기존 대비 10% 증액하는 것으로 결정되었습니다..."></textarea>
+    <div class="input-footer">
+      <span class="char-count" id="charCount">0자 입력됨</span>
+      <button type="button" class="sample-link" id="sampleBtn">예시 회의록 채워보기</button>
+    </div>
+  </section>
+
+  <button type="button" id="summarizeBtn">회의 내용 정리하기</button>
+
+  <section class="card" style="margin-top: 20px;">
+    <h2>✅ 정리 결과</h2>
+    <div id="resultArea">
+      <p class="empty-state">아직 정리된 내용이 없습니다.<br>위 입력창에 회의 내용을 붙여넣고 버튼을 눌러보세요.</p>
+    </div>
+  </section>
+
+  <footer>
+    미팅클립은 데모 화면입니다. 실제 서비스에서는 AI가 더 정교하게 회의 내용을 분석합니다.
+  </footer>
+
+</div>
+
+<script>
+(function () {
+  var input = document.getElementById('meetingInput');
+  var charCount = document.getElementById('charCount');
+  var summarizeBtn = document.getElementById('summarizeBtn');
+  var resultArea = document.getElementById('resultArea');
+  var sampleBtn = document.getElementById('sampleBtn');
+
+  var SAMPLE_TEXT =
+"오늘 회의에서는 4분기 신규 서비스 출시 일정에 대해 논의했습니다.\n" +
+"박팀장은 출시일을 11월 셋째 주로 확정하자고 제안했고, 전원 동의했습니다.\n" +
+"이과장이 다음 주 금요일까지 디자인 시안을 최종 확정하기로 했습니다.\n" +
+"마케팅 예산은 기존 계획 대비 15% 증액하는 것으로 결정되었습니다.\n" +
+"김대리는 이번 주 내로 경쟁사 서비스 비교 자료를 정리해서 공유하기로 했습니다.\n" +
+"고객 지원팀 인력 충원 여부는 다음 회의에서 다시 논의하기로 했습니다.\n" +
+"최과장이 협력사와의 계약 조건을 다음 주 화요일까지 재검토하기로 했습니다.";
+
+  input.addEventListener('input', updateCharCount);
+  sampleBtn.addEventListener('click', function () {
+    input.value = SAMPLE_TEXT;
+    updateCharCount();
+    input.focus();
+  });
+  summarizeBtn.addEventListener('click', handleSummarize);
+
+  function updateCharCount() {
+    var len = input.value.length;
+    charCount.textContent = len + '자 입력됨';
+  }
+
+  function handleSummarize() {
+    var text = input.value.trim();
+
+    if (!text) {
+      resultArea.innerHTML = '<p class="empty-state">회의 내용을 먼저 입력해주세요.</p>';
+      input.focus();
+      return;
+    }
+
+    summarizeBtn.disabled = true;
+    summarizeBtn.textContent = '정리하는 중...';
+    resultArea.innerHTML = '<p class="empty-state">회의 내용을 분석하고 있습니다...</p>';
+
+    // 실제 서비스라면 이 지점에서 AI API를 호출합니다.
+    // 지금은 화면 흐름을 보여주기 위한 간단한 텍스트 분석으로 대체합니다.
+    setTimeout(function () {
+      var result = analyzeMeeting(text);
+      renderResult(result);
+      summarizeBtn.disabled = false;
+      summarizeBtn.textContent = '회의 내용 정리하기';
+    }, 500);
+  }
+
+  function analyzeMeeting(text) {
+    var sentences = splitIntoSentences(text);
+
+    var actionPatterns = /(하기로|하겠습니다|할 것|해야|예정|까지.*(정리|공유|검토|제출|완료)|TODO|to-?do)/i;
+    var decisionPatterns = /(결정|확정|합의|동의)/;
+
+    var actionItems = [];
+    var decisionItems = [];
+    var general = [];
+
+    sentences.forEach(function (s) {
+      var trimmed = s.trim();
+      if (!trimmed) return;
+
+      if (actionPatterns.test(trimmed)) {
+        actionItems.push(trimmed);
+      } else if (decisionPatterns.test(trimmed)) {
+        decisionItems.push(trimmed);
+      } else {
+        general.push(trimmed);
+      }
+    });
+
+    // 핵심 요약: 결정/일반 문장 중 중요해 보이는 상위 문장 추려서 사용
+    var summaryPool = decisionItems.concat(general);
+    var summary = pickTopSentences(summaryPool, sentences, 4);
+
+    return {
+      summary: summary,
+      decisions: decisionItems,
+      actions: actionItems
+    };
+  }
+
+  function splitIntoSentences(text) {
+    return text
+      .split(/\n+/)
+      .join('. ')
+      .split(/(?<=[.!?다요됨함])\s+|\n+/)
+      .map(function (s) { return s.trim(); })
+      .filter(Boolean);
+  }
+
+  function pickTopSentences(pool, allSentences, count) {
+    if (pool.length === 0) pool = allSentences;
+
+    var wordFreq = {};
+    allSentences.join(' ').split(/\s+/).forEach(function (w) {
+      if (w.length < 2) return;
+      wordFreq[w] = (wordFreq[w] || 0) + 1;
+    });
+
+    var scored = pool.map(function (s) {
+      var words = s.split(/\s+/);
+      var score = words.reduce(function (acc, w) {
+        return acc + (wordFreq[w] || 0);
+      }, 0) / Math.max(words.length, 1);
+      return { text: s, score: score };
+    });
+
+    scored.sort(function (a, b) { return b.score - a.score; });
+
+    var top = scored.slice(0, count).map(function (s) { return s.text; });
+
+    // 원문 등장 순서로 재정렬
+    return allSentences.filter(function (s) { return top.indexOf(s) !== -1; });
+  }
+
+  function renderResult(result) {
+    var html = '';
+
+    html += '<div class="result-section">';
+    html += '<h3>핵심 요약</h3>';
+    html += '<ul>';
+    if (result.summary.length) {
+      result.summary.forEach(function (s) {
+        html += '<li>' + escapeHtml(s) + '</li>';
+      });
+    } else {
+      html += '<li>요약할 내용을 찾지 못했습니다.</li>';
+    }
+    html += '</ul></div>';
+
+    if (result.decisions.length) {
+      html += '<div class="result-section">';
+      html += '<h3>결정 사항</h3><ul>';
+      result.decisions.forEach(function (s) {
+        html += '<li><span class="action-tag">결정</span>' + escapeHtml(s) + '</li>';
+      });
+      html += '</ul></div>';
+    }
+
+    if (result.actions.length) {
+      html += '<div class="result-section">';
+      html += '<h3>할 일 / 액션 아이템</h3><ul>';
+      result.actions.forEach(function (s) {
+        html += '<li><span class="action-tag">TODO</span>' + escapeHtml(s) + '</li>';
+      });
+      html += '</ul></div>';
+    }
+
+    html += '<p class="demo-note">* 이 결과는 데모용 간단 분석입니다. 실제 서비스에서는 AI 모델이 문맥을 이해해 더 정확하게 정리해 드립니다.</p>';
+
+    resultArea.innerHTML = html;
+  }
+
+  function escapeHtml(str) {
+    var div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+})();
+</script>
+</body>
+</html>
